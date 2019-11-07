@@ -1,7 +1,12 @@
 \documentclass{article}
 \usepackage{plantuml}
+\usepackage{etoc}
 
 \begin{document}
+
+\newpage
+\tableofcontents
+\newpage
 
 \section{Introduzione}
 
@@ -9,69 +14,12 @@
 
 \section{Il linguaggio Protelis}
 
-\subsection{Descrizione degli internals di Protelis}
+\input{chapters/Il linguaggio Protelis}
 
-\subsubsection{ProtelisVM}
+\section{Progettazione e implementazione}
 
-ProtelisVM è la parte centrale del linguaggio: consente l'esecuzione di un programma in un device.
+\input{chapters/Progettazione e implementazione}
 
-\subsubsection{ExecutionContext}
-
-ExecutionContext è lo strato che si pone tra la virtual machine e l'ambiente nel quale questa viene eseguita. È responsabile di tre compiti:
-
-\begin{itemize}
-    \item{mantenere lo stato della virtual machine locale attraverso i cicli di esecuzione;}
-
-    \item{mantenere lo stato condiviso dai dispositivi vicini;}
-
-    \item{interfacciarsi con l'ambiente nel quale il dispositivo è \textit{embedded}, come tempo, spazio o sensori;}
-\end{itemize}
-
-\subsubsection{AbstractExecutionContext}
-
-AbstractExecutionContext è una realizzazione parziale di ExecutionContext: implementa le tutte le funzioni che dovrebbero essere fornite da un \textit{context}. In particolare utilizza un NetworkManager per la funzione di condivisione dello stato con i dispositivi vicini.
-
-\subsubsection{NetworkManager}
-
-Il NetworkManager è l'astrazione di rete utilizzata dalla virtual machine. È il componente che si deve occupare dello scambio di messaggi riguardanti lo stato con gli altri dispositivi del sistema.
-
-\subsection{Definizione di wrapper}
-
-\subsubsection{Device}
-
-Qui sotto dovrei avere i miei UML.
-
-\begin{center}
-\begin{plantuml}
-@startuml
-
-Interface NetworkManager
-
-Device -- ProtelisProgram : executes
-Device -- NetworkManager : uses
-Device -- DeviceCapabilities : features
-
-class Device {
-  ProtelisProgram program
-  NetworkMananger nm
-
-  runCycle()
-}
-
-class ProtelisProgram {
-
-}
-@enduml
-\end{plantuml}
-
-\end{center}
-
-Ma pure qua sopra.
-
-\subsection{Esempio memoria condivisa}
-
-\subsection{Esempio con socket}
-
-\subsection{Esempio con protocollo MQTT}
+\section{Conclusioni}
 
 \end{document}
