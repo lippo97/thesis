@@ -1,0 +1,38 @@
+\section{Progettazione}
+
+\subsection{Wrapping delle API}
+
+\subsubsection{DeviceCapabilities}
+
+È
+
+\subsubsection{Device}
+
+Qui sotto dovrei avere i miei UML.
+
+\begin{center}
+\begin{plantuml}
+@startuml
+
+Interface NetworkManager
+
+Device -- ProtelisProgram : executes
+Device -- NetworkManager : uses
+Device -- DeviceCapabilities : features
+
+class Device {
+  ProtelisProgram program
+  NetworkMananger nm
+
+  runCycle()
+}
+
+class ProtelisProgram {
+
+}
+@enduml
+\end{plantuml}
+
+\end{center}
+
+Ma pure qua sopra.

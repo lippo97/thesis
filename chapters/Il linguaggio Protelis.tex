@@ -1,3 +1,30 @@
+\section{Il linguaggio Protelis}
 \subsection{Motivazioni}
 
 \subsection{Piattaforme di supporto}
+
+\subsection{Descrizione delle API}
+
+\subsubsection{ProtelisVM}
+
+ProtelisVM è la parte centrale del linguaggio: consente l'esecuzione di un programma in un device.
+
+\subsubsection{ExecutionContext}
+
+ExecutionContext è lo strato che si pone tra la virtual machine e l'ambiente nel quale questa viene eseguita. È responsabile di tre compiti:
+
+\begin{itemize}
+    \item{mantenere lo stato della virtual machine locale attraverso i cicli di esecuzione;}
+
+    \item{mantenere lo stato condiviso dai dispositivi vicini;}
+
+    \item{interfacciarsi con l'ambiente nel quale il dispositivo è \textit{embedded}, come tempo, spazio o sensori;}
+\end{itemize}
+
+\subsubsection{AbstractExecutionContext}
+
+AbstractExecutionContext è una realizzazione parziale di ExecutionContext: implementa le tutte le funzioni che dovrebbero essere fornite da un \textit{context}. In particolare utilizza un NetworkManager per la funzione di condivisione dello stato con i dispositivi vicini.
+
+\subsubsection{NetworkManager}
+
+Il NetworkManager è l'astrazione di rete utilizzata dalla virtual machine. È il componente che si deve occupare dello scambio di messaggi riguardanti lo stato con gli altri dispositivi del sistema.
