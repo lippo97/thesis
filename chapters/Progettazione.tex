@@ -1,38 +1,78 @@
 \section{Progettazione}
 
+Si vuole modellare una rete di dispositivi che siano in grado di comunicare tra
+di loro. Viene introdotto l'elemento \texttt{Device}: un generico dispositivo in una rete
+in grado di eseguire programmi Protelis e di comunicare con altri dispositivi
+vicini. Ciascun dispositivo deve integrare al proprio interno una macchina
+virtuale Protelis in modo da poter eseguire un dato programma.
+
+Per semplicità si assume che i dispositivi abbiano già eseguito la fase di
+discover e che quindi ciascun dispositivo conosca i propri vicini.
+
 \subsection{Wrapping delle API}
 
-\subsubsection{DeviceCapabilities}
-
-È
-
 \subsubsection{Device}
-
-Qui sotto dovrei avere i miei UML.
+Un \texttt{Device} rappresenta un generico dispositivo in grado di eseguire programmi
+Protelis, per questo scopo contiene al proprio interno una \texttt{ProtelisVM}. Il dispositivo si trova all'interno di una rete e deve essere in grado
+di comunicare con i propri vicini per conoscere gli aggiornamenti del loro
+stato.
 
 \begin{center}
-\begin{plantuml}
-@startuml
+  \begin{plantuml}
+    @startuml
+    Device -- ProtelisProgram : executes
+    Device -- NetworkManager : uses
+    Device -- DeviceCapabilities : features
 
-Interface NetworkManager
+    Interface NetworkManager
+    class Device {
+      ProtelisProgram program
+      NetworkMananger nm
 
-Device -- ProtelisProgram : executes
-Device -- NetworkManager : uses
-Device -- DeviceCapabilities : features
+      void runCycle()
+    }
 
-class Device {
-  ProtelisProgram program
-  NetworkMananger nm
-
-  runCycle()
-}
-
-class ProtelisProgram {
-
-}
-@enduml
-\end{plantuml}
-
+    class ProtelisProgram { }
+    @enduml
+  \end{plantuml}
 \end{center}
 
-Ma pure qua sopra.
+Ogni device è contraddistinto da un \texttt{DeviceUID} univoco, che in questo
+progetto è stato realizzato con un numero intero incrementale che parte da
+0. Nel metodo costruttore gli viene passata l'istanza di
+\texttt{ProtelisProgram} che dovrà eseguire. Al proprio interno instanzia
+un'opportuna implementazione di \texttt{ExecutionContext}, il quale riferimento
+viene passato alla macchina virtuale. Espone un metodo \texttt{runCycle()} per
+eseguire in maniera sincrona un ciclo di esecuzione della macchina virtuale al
+proprio interno. Utilizza lo \textit{strategy pattern} per definire qual'è la
+modalità utilizzata dal dispositivo per comunicare con gli altri nodi. Ogni
+singola implementazione di \texttt{NetworkManager} verrà, in seguito, discussa
+singolarmente. Allo stesso modo utilizza uno \texttt{Speaker}, ovvero
+un'implementazione del metodo \texttt{announce()} utilizzato dal programma
+Protelis che verrà fatto eseguire all'interno del dispositivo.
+
+
+
+\subsubsection{DeviceCapabilities}
+Realizza le tre caratteristiche richieste
+dall'\texttt{ExecutionContext} (\ref{sec:ExecutionContext}). Implementa anche
+l'interfaccia \texttt{Speaker} e realizza il metodo \texttt{announce()}
+utilizzato all'interno del programma Protelis che verrà eseguito.
+
+\begin{center}
+  \begin{plantuml}
+    @startuml
+
+    AbstractExecutionContext <|- DeviceCapabilities
+    Speaker -- DeviceCapabilities
+    NetworkManager -- DeviceCapabilities
+
+    abstract class AbstractExecutionContext
+    interface Speaker
+    class DeviceCapabilities {
+      void announce()
+
+    }
+    @enduml
+  \end{plantuml}
+\end{center}
