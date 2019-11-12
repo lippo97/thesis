@@ -1,0 +1,58 @@
+\chapter{Background}
+\section{Scenario}
+Nell'ambiente in cui viviamo siamo circondati da sempre più entità
+computazionali eterogenee tra loro. Device come smartphone, wearable, display
+pubblici, droni, insegne digitali, sensori di ogni tipo, stanno sempre più
+pervadendo il nostro ambiente quotidiano. L'interazione tra questi dispositivi
+vicini gioca un ruolo fondamentale in settori emergenti come Internet-of-Things,
+Smart City, reti di sensori o più in generale in sistemi collettivi
+adattivi. Quando si parla di questo tipo di sistemi si deve tenere in
+considerazione l'elevato numero di dispositivi diversi di cui essi sono
+composti, quindi il numero di piattaforme, tecnologie, modelli di
+programmazione, protocolli, etc.. Le specifiche di basso livello, come
+efficienza, organizzazione e coordinazione di questi dispositivi in un sistema
+distribuito, influenzano pesantemente le scelte di design di quest'ultimo. Ne
+risulta un sistema rigido, costoso da mantenere, estendere ed eventualmente
+scalare.
+
+Sorge quindi la necessità di un modello di programmazione più ad alto livello,
+che consenta di astrarre i dettagli di sistema in larga scala, delegando allo
+strato sottostante tutte le questioni legate al \textit{deployment}, che possa
+occuparsi di tutti i requisiti non funzionali come le proprietà di
+auto-organizzazione e auto-adattività. Possono essere elencate tre
+caratteristiche chiave che questo strato dovrebbe semplificare: \textit{(1)} i
+meccanismi di coordinazione dovrebbero essere nascosti e i gli sviluppatori non
+dovrebbero essere tenuti a interagire con essi; \textit{(2)} la composizione di
+moduli o sottosistemi dovrebbe essere semplice e trasparente; \textit{(3)}
+sottosistemi distinti necessitano di meccanismi di coordinazione per distinti
+regioni e tempo.\cite{DBLP:journals/computer/BealPV15}
+
+\section{Aggregate computing}
+Una risposta a questo problema è fornita dal paradigma di \textit{aggregate
+  computing}, che si propone di risolvere le precedenti questioni tramite i
+seguenti principi:
+\begin{enumerate}
+\item il dispositivo programmato è una regione dell'ambiente computazionale e
+  prescinde dagli specifici dettagli;
+\item il programma è specificato come manipolazione di strutture dati con
+\end{enumerate}
+
+
+
+Aggregate programming aims to address these issues using the following
+three principles:
+1) the “machine” being programmed is a region of
+the computational environment whose specific
+details are abstracted away (perhaps even to a
+pure spatial continuum);
+2) the program is specified as manipulation of
+data constructs with spatial and temporal extent
+across that region; and
+3) these manipulations are actually executed by the
+individual devices in the region, using resilient
+coordination mechanisms and proximity-based
+interactions.
+Una risposta a questo problema è fornita dal paradigma di \textit{aggregate
+  computing}, che introduce il concetto di \textit{field computazionale}: una
+``mappa'' dispositivo-valore variabile nel tempo. \section{Protelis}
+\section{Architettura di Protelis}
