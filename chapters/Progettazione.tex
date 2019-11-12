@@ -1,5 +1,4 @@
 \section{Progettazione}
-
 Si vuole modellare una rete di dispositivi che siano in grado di comunicare tra
 di loro. Viene introdotto l'elemento \texttt{Device}: un generico dispositivo in una rete
 in grado di eseguire programmi Protelis e di comunicare con altri dispositivi
@@ -10,7 +9,6 @@ Per semplicità si assume che i dispositivi abbiano già eseguito la fase di
 discover e che quindi ciascun dispositivo conosca i propri vicini.
 
 \subsection{Wrapping delle API}
-
 \subsubsection{Device}
 Un \texttt{Device} rappresenta un generico dispositivo in grado di eseguire programmi
 Protelis, per questo scopo contiene al proprio interno una \texttt{ProtelisVM}. Il dispositivo si trova all'interno di una rete e deve essere in grado
@@ -20,16 +18,28 @@ stato.
 \begin{center}
   \begin{plantuml}
     @startuml
-    Device -- ProtelisProgram : executes
-    Device -- NetworkManager : uses
-    Device -- DeviceCapabilities : features
+    Device *-- ProtelisVM
+    Device *-- DeviceCapabilities
+    Device *-- NetworkManager
+    Device -> ProtelisProgram : executes
 
-    Interface NetworkManager
+    interface NetworkManager {
+      +getNeighborState() : Map<DeviceUID, Map<CodePath, Object>>
+      +shareState(Map<CodePath, Object> toSend): void
+    }
     class Device {
-      ProtelisProgram program
-      NetworkMananger nm
+      -vm : ProtelisVM
+      -nm : NetworkManager
+      -dc : DeviceCapabilities
 
-      void runCycle()
+      +getNetworkManager() : NetworkManager
+      +getDeviceCapabilities() : DeviceCapabilities
+      +runCycle() : void
+    }
+
+    ProtelisVM o-- DeviceCapabilities
+    class ProtelisVM {
+      +runCycle() : void
     }
 
     class ProtelisProgram { }
@@ -51,8 +61,6 @@ singolarmente. Allo stesso modo utilizza uno \texttt{Speaker}, ovvero
 un'implementazione del metodo \texttt{announce()} utilizzato dal programma
 Protelis che verrà fatto eseguire all'interno del dispositivo.
 
-
-
 \subsubsection{DeviceCapabilities}
 Realizza le tre caratteristiche richieste
 dall'\texttt{ExecutionContext} (\ref{sec:ExecutionContext}). Implementa anche
@@ -63,16 +71,46 @@ utilizzato all'interno del programma Protelis che verrà eseguito.
   \begin{plantuml}
     @startuml
 
-    AbstractExecutionContext <|- DeviceCapabilities
-    Speaker -- DeviceCapabilities
-    NetworkManager -- DeviceCapabilities
+    AbstractExecutionContext <|--- DeviceCapabilities
+    Speaker --* DeviceCapabilities
+    NetworkManager <.. DeviceCapabilities : uses
+    DeviceUID --* DeviceCapabilities
 
-    abstract class AbstractExecutionContext
-    interface Speaker
+    abstract class AbstractExecutionContext {
+
+    }
+    interface NetworkManager {
+      +getNeighborState() : Map<DeviceUID, Map<CodePath, Object>>
+      +shareState(Map<CodePath, Object> toSend): void
+    }
+    interface Speaker {
+      +announce() : void
+    }
+    Speaker <|.. ConsoleSpeaker
+    class ConsoleSpeaker {
+      +announce() : void
+    }
+    DeviceUID <|.. IntDeviceUID
+    interface DeviceUID
+    class IntDeviceUID {
+      -uid : int
+      +getUID() : int
+    }
     class DeviceCapabilities {
-      void announce()
-
+      -speaker : Speaker
+      -deviceUID : IntDeviceUID
+      +instance() : AbstractExecutionContext
+      +getDeviceUID() : DeviceUID
+      +announce() : void
+      +getCurrentTime() : Number
+      +nextRandomDouble() : double
     }
     @enduml
   \end{plantuml}
 \end{center}
+
+Estende la già esistente \texttt{AbstractExecutionContext} che realizza gran
+parte delle funzioni richieste da un \texttt{ExecutionContext}. Utilizza le
+risorse della Java Virtual Machine per le funzioni \texttt{getCurrentTime()} e
+\texttt{nextRandomDouble()}.  Fa uso dello \textit{strategy pattern} per
+l'implementazione del metodo \texttt{announce()}.

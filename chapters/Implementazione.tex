@@ -1,5 +1,77 @@
 \section{Implementazione}
 
+\subsection{Svolgimento della simulazione}
+La simulazione svolta consiste in tre esecuzioni distinte di un programma
+Protelis all'interno di una rete di dispositivi. Ciascuna di queste simulazioni
+è stata eseguita utilizzando una tecnologia differente al fine di realizzare la
+comunicazione tra i nodi. Per ragioni di continuità il programma eseguito è
+stato sempre il medesimo.
+
+\subsubsection{Topologia della rete}
+Per verificare il funzionamento del software è stata simulata una rete di 5
+dispositivi, organizzati secondo una topologia ad anello, ovvero disposti a
+cerchio e ciascuno può comunicare solo con i dispositivi ad esso
+adiacenti. Solo ad uno di questi dispositivi è stata inizializzata una variabile
+\texttt{leader} lo distingue dagli altri. Ad ogni dispositivo è assegnato un id
+numerico incrementale che parte da 0.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{media/ring-network.jpg}
+  \caption{Topologia di rete ad anello}
+  \label{fig:1}
+\end{figure}
+
+\subsubsection{Descrizione del programma eseguito}
+Il programma Protelis eseguito dai dispositivi è il seguente:
+\begin{verbatim}
+module hello
+import protelis:state:time
+
+// Get a variable from the environment
+let leader = env.has("leader");
+
+if(leader) {
+        self.announce("The leader is at "+self.getDeviceUID().getUid());
+        self.announce("The leader's count is: "+countDownWithDecay(4,1));
+} else {
+        // Otherwise, stay silent
+        false;
+};
+
+// Check if any neighbor is the leader
+if (anyHood(nbr(leader))) {
+        // if so, speak!
+        self.announce("Hello from the leader to its neighbor at " +
+                       self.getDeviceUID().getUid());
+} else {
+        // Otherwise, stay silent
+        false;
+};
+\end{verbatim}
+Nelle prime due righe viene definito il nome del modulo di appartenenza del
+programma ed è importato il modulo nel quale è presente la funzione
+\texttt{countDownWithDecay()} utilizzata in seguito. Dopodiché la rete viene
+divisa in due parti sulla base della variabile booleana \texttt{leader}: la
+prima metà --- in questo caso solamente un nodo --- utilizza la funzione
+\texttt{announce()} per comunicare il proprio \texttt{DeviceUID} e per svolgere
+un conteggio a ritroso da 4 escluso; la seconda metà semplicemente valuta
+l'istruzione \texttt{false} per non eseguire alcun codice.
+Successivamente la rete viene partizionata nuovamente utilizzando come
+discriminante l'espressione \texttt{anyHood(nbr(leader))}, che permette di
+selezionare quelli che tra i propri vicini hanno almeno un \textit{leader}.
+Questi annunciano la propria vicinanza a un \textit{leader} e il proprio
+\texttt{DeviceUID}; i dispositivi che non sono vicini ad un \textit{leader} ---
+quindi anche essi stessi --- valuta nuovamente l'istruzione \texttt{false} per
+non eseguire nessuna istruzione.
+
+
+\subsection{Esempio memoria condivisa}
+
+\subsection{Esempio con socket}
+
+\subsection{Esempio con protocollo MQTT}
+
 \subsection{Strumenti di sviluppo}
 
 \subsubsection{Git}
@@ -81,11 +153,3 @@ definisce il linguaggio utilizzato e le azioni da eseguire. Quando il servizio �
 abilitato su un repository, viene notificato da GitHub ogni volta che viene
 caricata una nuova versione. Questa viene scaricata e vengono eseguiti i compiti
 precedentemente definiti.
-
-% Strumento di CI
-
-\subsection{Esempio memoria condivisa}
-
-\subsection{Esempio con socket}
-
-\subsection{Esempio con protocollo MQTT}
