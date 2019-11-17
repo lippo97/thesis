@@ -167,9 +167,8 @@ Queste API possono essere usate e composte tra loro per scrivere applicazioni
 distribuite senza proccuparsi di meccanismi di coordinazione. Infatti costruire
 delle API utilizzando degli operatori \textit{resilient} assicura che i servizi
 lo siano a loro volta.
-% Protelis nel mondo scientifico
-% Architettura di protelis
 
+% TODO: La sintassi?
 \section{Protelis}
 Il \textit{field calculus} è un fondamento teoretico importante, ma troppo di
 basso livello se paragonato all'ecosistema costruito intorno ai linguaggi di
@@ -180,6 +179,9 @@ isolato. Protelis si pone come obiettivo quello di integrare un interprete di
 hardware, operativo e piattaforme esistenti. È importante che questa
 implementazione sia facilmente portabile sia su un ambiente simulato che su una
 rete di dispositivi reale.
+
+La sintassi del linguaggio è di facile apprendimento in quanto si ispira a
+quella dei linguaggi C-like come Java.
 
 \subsection{Protelis nel mondo scientifico}
 Esistono situazioni reali nelle quali l'accesso a servizi basati sul cloud non è
@@ -217,20 +219,35 @@ sistema di coordinazione tra i servizi coinvolti per riavviare l'intero
 stack. La programmazione aggregata risolve questo problema tramite i propri
 meccanismi di sincronizzazione nativi.
 
-% TODO: Figura 3 di
-% Protelis: Practical Aggregate Programming
 \subsection{Architettura di Protelis}\label{subsec:Architettura di Protelis}
+\begin{figure}
+  \subfloat[Funzionamento di Protelis]{
+    % \includegraphics[height=5.5cm]{media/protelis-architecture.png}
+    \includegraphics[height=6.2cm]{media/protelis-architecture.png} \label{fig:architettura-protelis}
+  }\hfill
+  \subfloat[Estendibilità di Protelis]{
+    \includegraphics[height=6.2cm]{media/extend-protelis.png}
+    \label{fig:estensione-protelis}
+  }
+  \caption{Architettura astratta di Protelis (a) e meccanismo di estendibilità
+    previsto dal linguaggio (b).}
+\end{figure}
+
 Protelis è un linguaggio di programmazione aggregato, fortemente influenzato da
 Proto\cite{Proto}, che risolve questi problemi utilizzando una macchina
-virtuale\cite{Protelis}. Realizza un livello applicativo che implementa la semantica del
-\textit{field calculus}, esponendolo tramite una sintassi ispirata ai linguaggi
-C-like.
+virtuale\cite{Protelis}.  Inizialmente un parser traduce un programma Protelis
+in una rappresentazione comprensibile all'interprete, che può eseguirlo, in
+seguito, a intervalli regolari. L'interprete può interagire con l'ambiente
+circostante, implementato tramite tuple \textit{(chiave, valore)} (Figura
+\ref{fig:architettura-protelis}).
 
-Inizialmente un parser traduce un programma Protelis in
-una rappresentazione comprensibile all'interprete, che lo esegue a intervalli
-regolari. L'interprete può interagire con l'ambiente circostante leggendo o
-scrivendo variabili d'ambiante, che sono implementate tramite tuple
-\textit{(chiave, valore)} (Figura 3).
+La duplice possibilità di poter eseguire un interprete Protelis in due contesti
+diversi, quali sono un ambiente simulato e quello reale, evidenziano la
+necessità dell'introduzione di un componente middleware, che gestisca la
+comunicazione tra le macchine virtuali in maniera completamente trasparente a
+queste ultime (Figura \ref{fig:estensione-protelis}). Sfruttando la
+caratteristica del polimorfismo dei linguaggi ad oggetti, questo modello può
+essere facilmente specializzato in entrambi i contesti precedentemente citati.
 
 La piattaforma di supporto scelta per l'implementazione è Java, scelta
 supportata da molteplici motivi\cite{Protelis}. I principali sono: la sua

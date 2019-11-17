@@ -9,7 +9,14 @@ portabilità su diverse piattaforme. Per fare ciò è necessario realizzare un
 backend che definisca i meccanismi di comunicazione tra i dispositivi e
 gestisca l'esecuzione della macchina virtuale Protelis.
 
+% TODO: Descrizione di alchemist migliore
 \subsection{Alchemist}
+\begin{figure}
+  \centering
+  % \includegraphics[height=5.5cm]{media/alchemist-architecture.png}
+  \includegraphics[width=0.7\linewidth]{media/alchemist-architecture.png}
+  \caption{Implementazione di Protelis utilizzata in Alchemist}
+\end{figure}
 Tra le realizzazioni esistenti l'esempio più rilevante è
 Alchemist\footnote{https://alchemistsimulator.github.io/}: un simulatore per
 computazione pervasiva, aggregata e ispirata alla natura. Esso utilizza al
@@ -20,8 +27,8 @@ Alchemist prevede la probabilità di utilizzare incarnazioni, ovvero
 implementazioni concrete del proprio meta-modello per modellare uno specifico
 concetto di interesse. Una di queste incarnazioni è quella che consente al
 simulatore di eseguire un programma Protelis all'interno della propria
-infrastruttura, che permette di creare e gestire una rete di nodi simulati.
-
+infrastruttura, che permette di creare e gestire una rete di nodi simulati
+(Figura /ref{fig:alchemist-architettura}).
 
 \subsection{NASA World Wind}
 NASA World Wind\footnote{https://worldwind.arc.nasa.gov/} è un progetto
@@ -40,6 +47,7 @@ quadricotteri, disposti a griglia, volano a qualche centinaio di metri da
 terra. Essi fanno uso di comunicazione a corto raggio, 500 metri, per parlare
 con i dispositivi adiacenti.
 
+% TODO: Spiegare bene la parte del CodePath
 \section{Sistemi distribuiti}
 I costrutti fondanti della programmazione aggregata e i building block possono
 semplificare notevolmente il design e lo sviluppo di applicazioni in un contesto
@@ -47,12 +55,6 @@ di Internet-of-Things\cite{DBLP:journals/computer/BealPV15}. Infatti consente di
 costruire, tramite composizione delle proprie API, delle applicazioni
 distribuite robuste e affidabili.
 
-% Definizione 1
-% Una applicazione distribuita è un termine che fa riferimento a una pluralità di
-% processi computazionali asincroni, eseguiti in dispositivi distinti e
-% comunicanti tramite scambio di messaggi\cite{Kshemkalyani:2008:DCP:1374804}.
-
-% Definizione 2
 Un sistema distribuito è una collezione di computer indipendenti che appare
 all'utente finale come un unico sistema coerente\cite{tanenbaum2016}.  Il
 concetto di indipendenza comporta che i dispositivi appartenenti al sistema non
@@ -67,16 +69,16 @@ L'architettura di Protelis (\ref{subsec:Architettura di Protelis}) è stata idea
 pertanto è possibile estenderla facilmente, tramite l'implementazione di uno
 strato middleware, che si occupa ciò.
 
-
-% Implementare NetworkManager
-% I dispositivi non stanno piu sulla stessa memoria
-% Bisogna organizzare scambio di messaggi
 % Serializzazione:
 % - time efficient
 % - hashing (probabilità molto bassa di errore)
 %
 
-
-%TODO: Cosa cambia qua
+% TODO: API Protelis qui o in architettura?
 \section{Architettura riusabile}
-%TODO: Introduzione di cosa ho fatto
+% Perché? A che bisogno risponde?
+%
+% Introduzione classi di Protelis
+% Strategy per Speaker e NetworkManager
+% Definizione di Device e DeviceCapabilities
+% Definizione modello riusabile
