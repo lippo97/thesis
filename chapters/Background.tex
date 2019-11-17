@@ -78,19 +78,25 @@ comunicazione e dai protocolli utilizzati per questa, orientano verso lo
 sviluppo di applicazioni distribuite più complesse, ma allo stesso tempo
 modulari, riusabili e facilmente estendibili.
 
-% TODO figura 1
-% https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8064162
-La programmazione aggregata nasconde la complessità della coordinazione di un
-sistema distribuito utilizzando diversi livelli di astrazione (Figura 3). La sua base
-fondante è il \textit{field calculus}: un insieme di costrutti fondamentali che
+L'obiettivo della programmazione aggregata è nascondere la complessità di
+coordinare un sistema distribuito utilizzando diversi livelli di astrazione.
+Nel tempo sono stati sviluppati diversi modelli di programmazione aggregata, ma
+la maggior parte di questi sono troppo specializzati per singole istanze di
+problemi e non sufficientemente generici da risolvere intere classi di
+problemi\cite{beal2012}.
+
+Tra questi però è stati sviluppato il \textit{field calculus}: un insieme di
+costrutti fondamentali, derivati dagli elementi comuni degli altri metodi e che
 modellano la computazione e l'interazione tra un largo numero di dispositivi
 sparsi nello spazio.
 
+% TODO figura 1
+% https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8064162
 \subsection{Field calculus}
 Utilizzando diversi approcci di programmazione aggregata emergono certi pattern
-che si ripetono. Il \textit{field calculus}
-\cite{Viroli2013} cattura queste caratteristiche in un
-minuscolo linguaggio universale adatto all'analisi matematica.
+che si ripetono. Il \textit{field calculus} \cite{Viroli2013} cattura queste
+caratteristiche in un minuscolo linguaggio universale adatto all'analisi
+matematica.
 
 L'elemento fondamentale del \textit{field calculus} è il campo computazionale,
 ispirato a concetti fisici come i campi magnetici, che associa ad ogni
@@ -190,8 +196,8 @@ un sistema di coordinazione centralizzata.
 
 Protelis ha una potenza espressiva molto elevata: è in grado di esprimere
 algoritmi distribuiti complessi in poche righe di codice. È infatti stato
-sfruttato per implementare diversi algoritmi distribuiti in questo ambito. Tra
-questi i più rilevanti sono: \textit{rendezvous} ad una riunione di
+sfruttato per implementare diversi algoritmi distribuiti. Tra questi i più
+rilevanti sono: \textit{rendezvous} ad una riunione di
 massa\footnote{https://protelis.github.io/peer-to-peer-route-planning}
 \cite{Protelis}, algoritmo che consente a due persone che partecipano ad un
 evento di massa di incontrarsi in un punto intermedio, evitando zone di alta
@@ -211,17 +217,9 @@ sistema di coordinazione tra i servizi coinvolti per riavviare l'intero
 stack. La programmazione aggregata risolve questo problema tramite i propri
 meccanismi di sincronizzazione nativi.
 
-
-% Distributed real-time shortest path computation\cite{Audrito2018}
-% Bounded Information Speed Gradient\cite{10.1007/978-3-319-59746-1_4}
-
-
-% Riferimenti a problemi reali risolti con Protelis
-
-
 % TODO: Figura 3 di
 % Protelis: Practical Aggregate Programming
-\subsection{Architettura di Protelis}
+\subsection{Architettura di Protelis}\label{subsec:Architettura di Protelis}
 Protelis è un linguaggio di programmazione aggregato, fortemente influenzato da
 Proto\cite{Proto}, che risolve questi problemi utilizzando una macchina
 virtuale\cite{Protelis}. Realizza un livello applicativo che implementa la semantica del
