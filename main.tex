@@ -1,22 +1,61 @@
-\documentclass{book}
-\usepackage{cite}
-\usepackage{plantuml}
-\usepackage{etoc}
-\usepackage{graphicx}
-\usepackage{float}
-\usepackage[labelsep=quad,indention=10pt]{subfig}
+\documentclass[12pt,a4paper,twoside,openright]{book}
+
 \usepackage[italian]{babel}
+\usepackage{style/isi-lt}
+\usepackage{cite}
+\usepackage{svg}
+\usepackage{calc}
+
+\input{style/isi-lst}
+
+%--------------------------------------------------------------------
+%---------------------- INFORMAZIONI SULLA TESI ---------------------
+%--------------------------------------------------------------------
+
+\universita{Alma Mater Studiorum -- Università di Bologna}
+\campus{Campus di Cesena}
+\dipartimento{Dipartimento di Informatica -- Scienza e Ingegneria}
+\cdl{Corso di Laurea in Ingegneria e Scienze Informatiche}
+
+% \titolo{Qui il titolo\\della\\tesi}
+\titolo{Sviluppo di backend \\per il linguaggio Protelis \\in Kotlin e Java}
+\materia{Programmazione ad Oggetti}
+
+\laureando{Filippo Nardini}
+
+\relatore[Prof.]{Danilo Pianini}
+\correlatorea[Prof.]{Mirko Viroli}
+
+\annoaccademico{2018 -- 2019}
+
+\dedica{A Coro, mia fonte di ispirazione suprema.}
+
+\makeindex
 
 \begin{document}
+\frontmatter
 
+\maketitle
 \tableofcontents
 
-\input{chapters/Background}
-\input{chapters/Architettura riusabile per backend Protelis}
-\input{chapters/Esempi applicativi}
-\input{chapters/Conclusioni}
+% \input{thesis-parts/introduction.tex}
 
-\bibliography{references/references}{}
+\mainmatter
+
+\pagestyle{fancy}
+\fancyhead[LE,RO]{\thepage}
+\fancyfoot{}
+
+\input{thesis-parts/chapter-one.tex}
+\input{thesis-parts/chapter-two.tex}
+\input{thesis-parts/chapter-three.tex}
+
+\input{thesis-parts/conclusions.tex}
+% \input{thesis-parts/acknowledgements.tex}
+
+\backmatter
+
+\bibliography{bibliografia.bib}{}
 \bibliographystyle{plain}
 
 \end{document}

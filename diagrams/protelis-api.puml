@@ -1,0 +1,10 @@
+@startuml
+
+skinparam dpi 250
+
+ProtelisVM o-- ExecutionContext : uses
+ProtelisVM o- ProtelisProgram : executes
+interface ExecutionContext
+interface ProtelisProgram
+class ProtelisVM
+@enduml

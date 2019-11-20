@@ -1,0 +1,8 @@
+@startuml
+
+skinparam dpi 250
+
+Device *- DeviceCapabilities
+DeviceCapabilities <|- AbstractExecutionContext
+NetworkManager --* DeviceCapabilities
+@enduml

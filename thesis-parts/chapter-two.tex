@@ -13,7 +13,7 @@ gestisca l'esecuzione della macchina virtuale Protelis.
 \subsection{Alchemist}
 \begin{figure}
   \centering
-  \includegraphics[width=0.7\linewidth]{media/alchemist-architecture.png}
+  \includegraphics[width=0.7\linewidth]{images/alchemist-architecture.png}
   \caption{Implementazione di Protelis utilizzata in Alchemist.}
 \end{figure}
 Tra le realizzazioni esistenti l'esempio più rilevante è
@@ -113,16 +113,8 @@ l'esterno. L'interfaccia permette di azionarne i cicli di esecuzione.
 
 \begin{figure}
   \centering
-    \begin{plantuml}
-      @startuml
-      ProtelisVM o-- ExecutionContext : uses
-      ProtelisVM o- ProtelisProgram : executes
-      interface ExecutionContext
-      interface ProtelisProgram
-      class ProtelisVM
-      @enduml
-    \end{plantuml}
-    \caption{Relazione tra \texttt{ProtelisVM}, \texttt{ExecutionContext} e
+  \includegraphics[width=\linewidth]{diagrams/output/protelis-api}
+  \caption{Relazione tra \texttt{ProtelisVM}, \texttt{ExecutionContext} e
       \texttt{ProtelisProgram}.}
   \label{fig:uml-protelisvm}
 \end{figure}
@@ -147,16 +139,8 @@ giusto tra efficienza e condivisione dello stato.
 
 \begin{figure}
   \centering
-    \begin{plantuml}
-      @startuml
-      NetworkManager -o AbstractExecutionContext : features
-      ProtelisVM o- ExecutionContext : uses
-      ExecutionContext <|.. AbstractExecutionContext
-      interface NetworkManager
-      interface ExecutionContext
-      abstract class AbstractExecutionContext
-      @enduml
-    \end{plantuml}
+  % \def\svgscale{2}
+  \includegraphics[width=\linewidth]{diagrams/output/networkmanager}
     \caption{Introduzione di \texttt{AbstractExecutionContext} e \texttt{NetworkManager}.}
   \label{fig:uml-networkmanager}
 \end{figure}
@@ -188,13 +172,7 @@ dispositivo:
 
 \begin{figure}
   \centering
-    \begin{plantuml}
-      @startuml
-      Device *- DeviceCapabilities
-      DeviceCapabilities <|- AbstractExecutionContext
-      NetworkManager --* DeviceCapabilities
-      @enduml
-    \end{plantuml}
+  \includegraphics[width=\linewidth]{diagrams/output/device}
     \caption{Introduzione di \texttt{DeviceCapabilities} e \texttt{Device}.}
   \label{fig:uml-device}
 \end{figure}

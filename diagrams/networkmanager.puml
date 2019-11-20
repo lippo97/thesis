@@ -1,0 +1,11 @@
+@startuml
+
+skinparam dpi 250
+
+NetworkManager -o AbstractExecutionContext : features
+ProtelisVM o- ExecutionContext : uses
+ExecutionContext <|.. AbstractExecutionContext
+interface NetworkManager
+interface ExecutionContext
+abstract class AbstractExecutionContext
+@enduml
