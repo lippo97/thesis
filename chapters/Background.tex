@@ -2,25 +2,26 @@
 \section{Scenario}
 Nell'ambiente in cui viviamo siamo circondati da sempre più entità
 computazionali eterogenee tra loro. Device come smartphone, wearable, display
-pubblici, droni, insegne digitali, sensori di ogni tipo, stanno sempre più
+pubblici, droni, insegne digitali, sensori di ogni tipo stanno sempre più
 pervadendo il nostro ambiente quotidiano. L'interazione tra questi dispositivi
 vicini gioca un ruolo fondamentale in settori emergenti come Internet-of-Things,
 Smart City, reti di sensori o più in generale in sistemi collettivi
 adattivi. Quando si parla di questo tipo di sistemi si deve tenere in
 considerazione l'elevato numero di dispositivi diversi di cui essi sono
-composti, quindi il numero di piattaforme, tecnologie, modelli di
-programmazione, protocolli, etc.. Le specifiche di basso livello, come
+composti, quindi il numero di piattaforme, tecnologie, paradigmi di
+programmazione, protocolli utilizzati, etc.. Le specifiche di basso livello, come
 efficienza, organizzazione e coordinazione di questi dispositivi in un sistema
 distribuito, influenzano pesantemente le scelte di design di quest'ultimo. Ne
 risulta un sistema rigido, costoso da mantenere, estendere ed eventualmente
-scalare.
+scalare in dimensione.
 
 Sorge quindi la necessità di un modello di programmazione più ad alto livello,
-che consenta di astrarre i dettagli di sistema in larga scala, delegando allo
-strato sottostante tutte le questioni legate al \textit{deployment}, che possa
-occuparsi di tutti i requisiti non funzionali come le proprietà di
-auto-organizzazione e auto-adattività. Possono essere elencate tre
-caratteristiche chiave\cite{DBLP:journals/computer/BealPV15} che questo strato dovrebbe semplificare:
+che consenta di astrarre i dettagli di un sistema e possa occuparsi di tutti i
+requisiti non funzionali come le proprietà di auto-organizzazione e
+auto-adattività, delegando allo strato sottostante tutte le questioni legate al
+\textit{deployment}. Possono essere elencate tre caratteristiche
+chiave che questo strato dovrebbe semplificare\cite{DBLP:journals/computer/BealPV15
+}:
 \begin{itemize}
 \item i meccanismi di coordinazione dovrebbero essere nascosti e i gli
   sviluppatori non dovrebbero essere tenuti a interagire con essi;
@@ -31,7 +32,21 @@ regioni e tempo.
 \end{itemize}
 
 
+% TODO: Cambiare immagine
+% http://openmap.bbn.com/~jbeal/Publications/Computer-AggregateProgramming-Preprint-2015.pdf
 \section{Aggregate computing}
+\begin{figure}
+  \centering
+  \subfloat[Programmazione device-centric]{
+    \includegraphics[width=\linewidth]{media/placeholder.jpg}
+    \label{fig:device-centric}
+  }\hfill
+  \subfloat[Programmazione aggregata]{
+    \includegraphics[width=\linewidth]{media/placeholder.jpg}
+    \label{fig:aggregate-computing}
+  }
+  \caption{Differenze tra programmazione orientata al singolo dispositivo e programmazione aggregata.}
+\end{figure}
 L'osservazione che viene fatta spesso è che spesso il comportamento collettivo
 di un sistema interessa più del singolo dispositivo di cui è composto, ma i
 linguaggi di programmazione classici, orientati al singolo dispositivo, forzano
@@ -57,21 +72,19 @@ zone che possono essere considerate pericolose perché troppo dense, che percors
 seguire eventualmente per disperderle; più in generale possono essere erogate
 indicazioni per raggiungere un punto scelto evitando le zone più pericolose.
 
-% continuum-like (traduzione?)
-% TODO: figura 2
-% http://openmap.bbn.com/~jbeal/Publications/Computer-AggregateProgramming-Preprint-2015.pdf
-La figura 2a mostra come con un linguaggio di programmazione orientato al
-singolo device il programmatore sia costretto a porre la propria attenzione
-sull'interazione tra i dispositivi, mentre si occupa di modellare localmente un
-comportamento che dovrà produrre un certo effetto globale.
-Invece, con l'utilizzo della programmazione aggregata (figura 2b), si è liberi
-di pensare in maniera più naturale tramite strutture dati
-\textit{continuum-like} e servizi che possono essere composti in maniera modulare.
-Nello specifico il servizio di \textit{crowd estimation} produce in output una
-struttura dati distribuita --- un campo computazionale --- che associa ad ogni
-posizione una densità di popolazione. Questo è l'input dei servizi che poi si
-vogliono costruire: navigazione, segnalazione delle zone di pericolo ed
-istruzioni per un'eventuale evacuazione.
+La figura \ref{fig:device-centric} mostra come con un linguaggio di
+programmazione orientato al singolo device il programmatore sia costretto a
+porre la propria attenzione sull'interazione tra i dispositivi, mentre si occupa
+di modellare localmente un comportamento che dovrà produrre un certo effetto
+globale.  Invece, con l'utilizzo della programmazione aggregata (figura
+\ref{fig:aggregate-computing}), si è liberi di pensare in maniera più naturale
+tramite strutture dati \textit{continuum-like} e servizi che possono essere
+composti in maniera modulare.  Nello specifico il servizio di \textit{crowd
+  estimation} produce in output una struttura dati distribuita --- un campo
+computazionale --- che associa ad ogni posizione una densità di
+popolazione. Questo è l'input dei servizi che poi si vogliono costruire:
+navigazione, segnalazione delle zone di pericolo ed istruzioni per un'eventuale
+evacuazione.
 
 La capacità di separare la logica dei servizi dall'implementazione della
 comunicazione e dai protocolli utilizzati per questa, orientano verso lo
@@ -81,12 +94,12 @@ modulari, riusabili e facilmente estendibili.
 L'obiettivo della programmazione aggregata è nascondere la complessità di
 coordinare un sistema distribuito utilizzando diversi livelli di astrazione.
 Nel tempo sono stati sviluppati diversi modelli di programmazione aggregata, ma
-la maggior parte di questi sono troppo specializzati per singole istanze di
-problemi e non sufficientemente generici da risolvere intere classi di
-problemi\cite{beal2012}.
+la maggior parte di questi si sono rivelati troppo specializzati per singole
+istanze di problemi e non sufficientemente generici da risolvere intere classi
+di questi\cite{beal2012}.
 
-Tra questi però è stati sviluppato il \textit{field calculus}: un insieme di
-costrutti fondamentali, derivati dagli elementi comuni degli altri metodi e che
+Tra questi però è stato sviluppato il \textit{field calculus}: un insieme di
+costrutti fondamentali, derivati dagli elementi comuni degli altri metodi, che
 modellano la computazione e l'interazione tra un largo numero di dispositivi
 sparsi nello spazio.
 
@@ -102,7 +115,7 @@ L'elemento fondamentale del \textit{field calculus} è il campo computazionale,
 ispirato a concetti fisici come i campi magnetici, che associa ad ogni
 dispositivo in rete un valore locale. Ogni valore, funzione o variabile è un
 campo: per esempio una collezione di sensori di temperatura produce un campo di
-temperature dell'ambiente, una collazione di accelerometri di smartphone produce
+temperature dell'ambiente, una collezione di accelerometri di smartphone produce
 un campo di direzioni, una notifica di un'applicazione produce un campo di
 messaggi.
 
@@ -111,7 +124,7 @@ I campi sono generati e manipolati utilizzando quattro costrutti fondamentali:
 \item \textbf{Funzioni}: \texttt{b($e_1,\ldots, e_n$)} applica la funzione \texttt{b}
   agli argomenti \texttt{$e_1,\ldots, e_n$}. Queste sono funzioni matematiche,
   logiche o algoritmiche stateless, oppure sensori, attuatori, funzioni definite
-  dall'utente o importate.
+  dall'utente o importate da librerie.
 
 \item \textbf{Dynamics}: \texttt{rep(x<-v) \{$s_1;\ldots;s_n$\}} definisce una variabile
   locale di stato \texttt{x} inizializzata con il valore \textit{v} e aggiornata
@@ -136,32 +149,57 @@ I campi sono generati e manipolati utilizzando quattro costrutti fondamentali:
 Questi costrutti permettono la portabilità, indipendenza dall'infrastruttura e
 interazione con servizi non aggregati.
 
+% TODO: Ricontrollare
 \subsection{Building blocks}
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{media/placeholder.jpg}
+  \caption{Livelli di astrazione dell'aggregate computing. A basso livello le
+    capacità software e hardware vengono astratte e composte per creare un
+    livello comune: il \textit{field calculus}, che è la base di
+    partenza dell'architettura delle API.}
+  \label{fig:abstraction-layers}
+\end{figure}
+
+
 Il successivo livello di astrazione serve ad aggiungere resilienza. È
 identificata una collezione di operatori ``building block'' generici finalizzata
 a una coordinazione robusta delle applicazioni. I meccanismi di questo livello
-(quello in mezzo nella Figura 3), sono \textit{auto-stabilizzati}, cioé si
-adattano ai cambiamenti della rete o dei dati in input, scalabili a reti di
-grandi dimensioni e preservano la caratteristica di resilienza quando sono
-composti tra di loro\cite{7056345}.
+(quello in mezzo nella Figura \ref{fig:abstraction-layers}), sono
+\textit{auto-stabilizzati}, cioé si adattano ai cambiamenti della rete o dei
+dati in input, scalabili a reti di grandi dimensioni e preservano la
+caratteristica di resilienza quando sono composti tra di loro\cite{7056345}.
 
 La collezione è composta da tre operatori di coordinazione generali e
 dall'operatore built-in \texttt{if}. I tre operatori sono:
 \begin{itemize}
-\item \textbf{G}: che distribuisce un informazione nello spazio. Questo
-  operatore generalizza operazioni molto comuni come la stima della distanza e
-  messaggi broadcast.
-\item \textbf{C}: che aggrega un informazione in uno o più nodi.
-\item \textbf{T}: che generalizza un timer il cui rateo di aggiornamento può
-  variare nel tempo.
+\item \texttt{G(source, init, metric, accumulate)}: che distribuisce un
+  informazione nello spazio. Questo operatore generalizza operazioni molto
+  comuni come la stima della distanza e messaggi broadcast. Per farlo esegue due
+  azioni: computa un campo di distanze minime da una regione \texttt{source}
+  utilizzando la \texttt{metrica} scelta; in seguito propaga i valori attraverso
+  i nodi iniziando da \texttt{init} e modificandolo con la funzione
+  \texttt{accumulate}.
+\item \texttt{C(potential, accumulate, local, null)}: che aggrega un
+  informazione alla \texttt{source} attraversando il gradiente di un campo
+  \texttt{potential}. Viene effettuata una riduzione che, iniziando con il valore
+  \texttt{null} e sfruttando una funzione associativa \texttt{accumulate},
+  risale il gradiente verso la \texttt{sorgente} e combina i valori in
+  \texttt{local}.
+\item \texttt{T(init, floor, decay)}: che generalizza un timer il cui rateo di
+  aggiornamento può variare nel tempo. La funzione \texttt{decay} diminuisce il
+  valore del proprio input successivo, che parte da \texttt{initial} e si ferma
+  a \texttt{floor}.
 \end{itemize}
 
 \subsection{General-purpose API}
-È un ulteriore livello di astrazione (il secondo dall'alto nella Figura 3) che
-mira a soddisfare la necessità più generiche fornendo delle API di alto livello:
-funzioni come \texttt{distanceTo()} o \texttt{broadcast()}. Queste sono
-implementate a partire dai costrutti, già descritti, di cui è formato il livello
-sottostante e consentono di scrivere programmi più facilmente.
+È un ulteriore livello di astrazione (il secondo dall'alto nella Figura
+\ref{fig:abstraction-layers}) che mira a soddisfare la necessità più generiche
+fornendo delle API di alto livello: funzioni come \texttt{distanceTo}, che
+permette di ottenere la distanza tra nodi utilizzando una data metrica, o
+\texttt{broadcast}, che consente di diffondere un messaggio nella rete. Queste
+sono implementate a partire dai costrutti, già descritti, di cui è formato il
+livello sottostante e consentono di scrivere programmi più facilmente.
 
 Queste API possono essere usate e composte tra loro per scrivere applicazioni
 distribuite senza proccuparsi di meccanismi di coordinazione. Infatti costruire
@@ -173,12 +211,12 @@ lo siano a loro volta.
 Il \textit{field calculus} è un fondamento teoretico importante, ma troppo di
 basso livello se paragonato all'ecosistema costruito intorno ai linguaggi di
 programmazione moderni. L'assenza di tool, librerie e la mancata integrazione
-con piattaforme esistenti lo rendono uno strumento efficace, ma
-isolato. Protelis si pone come obiettivo quello di integrare un interprete di
-\textit{field calculus} in un architettura reale, ovvero che si interfacci con
-hardware, operativo e piattaforme esistenti. È importante che questa
-implementazione sia facilmente portabile sia su un ambiente simulato che su una
-rete di dispositivi reale.
+con piattaforme esistenti lo rendono uno strumento efficace, ma difficile da
+scrivere e isolato. Protelis si pone come obiettivo quello di integrare un
+interprete di \textit{field calculus} in un architettura reale, ovvero capace di
+interfacciarsi con hardware, sistemi operativi e piattaforme esistenti. È importante che
+questa implementazione sia facilmente portabile sia su un ambiente simulato che
+su una rete di dispositivi reale.
 
 La sintassi del linguaggio è di facile apprendimento in quanto si ispira a
 quella dei linguaggi C-like come Java.
@@ -222,8 +260,8 @@ meccanismi di sincronizzazione nativi.
 \subsection{Architettura di Protelis}\label{subsec:Architettura di Protelis}
 \begin{figure}
   \subfloat[Funzionamento di Protelis]{
-    % \includegraphics[height=5.5cm]{media/protelis-architecture.png}
-    \includegraphics[height=6.2cm]{media/protelis-architecture.png} \label{fig:architettura-protelis}
+    \includegraphics[height=6.2cm]{media/protelis-architecture.png}
+    \label{fig:architettura-protelis}
   }\hfill
   \subfloat[Estendibilità di Protelis]{
     \includegraphics[height=6.2cm]{media/extend-protelis.png}
@@ -234,7 +272,7 @@ meccanismi di sincronizzazione nativi.
 \end{figure}
 
 Protelis è un linguaggio di programmazione aggregato, fortemente influenzato da
-Proto\cite{Proto}, che risolve questi problemi utilizzando una macchina
+Proto\cite{Proto}, la cui esecuzione avviene su una macchina
 virtuale\cite{Protelis}.  Inizialmente un parser traduce un programma Protelis
 in una rappresentazione comprensibile all'interprete, che può eseguirlo, in
 seguito, a intervalli regolari. L'interprete può interagire con l'ambiente

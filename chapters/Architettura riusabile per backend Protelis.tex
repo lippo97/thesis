@@ -13,9 +13,8 @@ gestisca l'esecuzione della macchina virtuale Protelis.
 \subsection{Alchemist}
 \begin{figure}
   \centering
-  % \includegraphics[height=5.5cm]{media/alchemist-architecture.png}
   \includegraphics[width=0.7\linewidth]{media/alchemist-architecture.png}
-  \caption{Implementazione di Protelis utilizzata in Alchemist}
+  \caption{Implementazione di Protelis utilizzata in Alchemist.}
 \end{figure}
 Tra le realizzazioni esistenti l'esempio più rilevante è
 Alchemist\footnote{https://alchemistsimulator.github.io/}: un simulatore per
@@ -65,9 +64,10 @@ coordinarsi.
 
 Al fine di eseguire macchine virtuali Protelis in un contesto distribuito è
 necessario implementare un modello di scambio di messaggi tra queste.
-L'architettura di Protelis (\ref{subsec:Architettura di Protelis}) è stata ideata avendo questo problema ben chiaro,
-pertanto è possibile estenderla facilmente, tramite l'implementazione di uno
-strato middleware, che si occupa ciò.
+L'architettura di Protelis (\ref{subsec:Architettura di Protelis}) è stata
+ideata avendo questo problema ben chiaro, pertanto è possibile estenderla
+facilmente, tramite l'implementazione di uno strato middleware, che si occupa
+ciò.
 
 % Serializzazione:
 % - time efficient
@@ -76,6 +76,128 @@ strato middleware, che si occupa ciò.
 
 % TODO: API Protelis qui o in architettura?
 \section{Architettura riusabile}
+L'obiettivo di questa sezione è di modellare una architettura del backend di
+Protelis abbastanza flessibile, che consenta di incorporare la macchina virtuale
+all'interno di un dispositivo, così che attraverso questo sia possibile
+eseguirne le iterazioni. Concretamente si effettuerà un mapping delle
+caratteristiche di un dispositivo (livello in basso nella figura
+\ref{fig:abstraction-layers}), così che queste possano essere utilizzate per
+implementare i costrutti del \textit{field calculus}. Un obiettivo importante di
+questo modello sarà circoscrivere in un'entità ben definita il concetto di
+strategia di comunicazione. In questo modo il device sarà in grado di funzionare
+indipendentemente dal metodo specifico scelto per realizzarla.
+
+% TODO: da scrivere bene un'introduzione
+\subsection{API di Protelis}
+Le API del backend di Protelis sono scritte in Java, quindi sono facilmente
+integrabili anche con linguaggi eseguiti sulla Java Virtual Machine, per esempio
+come verrà mostrato in seguito Kotlin. Esse offrono le seguenti astrazioni.
+
+\subsubsection{ExecutionContext}
+Interfaccia che si pone fra una macchina virtuale Protelis e l'ambiente da cui
+essa è circondata. I suoi compiti sono tre:
+\begin{itemize}
+\item tenere traccia dello stato persistente attraverso le iterazioni successive
+  del prorgamma;
+\item tenere traccia dell'ultimo stato condiviso dai dispositivi vicini;
+\item tenere traccia dell'interazione del dispositivo con l'ambiente esterno
+  (tempo, spazio, sensori, attuatori, ecc).
+\end{itemize}
+
+\subsubsection{ProtelisVM}
+La macchina virtuale Protelis è il nucleo centrale dell'architettura: contiene
+l'interprete del linguaggio che al proprio interno implementa gli operatori del
+\textit{field calculus}. Accetta in input un \texttt{ProtelisProgram} e utilizza un
+\texttt{ExecutionContext} per mantenere il proprio stato e interfacciarsi con
+l'esterno. L'interfaccia permette di azionarne i cicli di esecuzione.
+
+\begin{figure}
+  \centering
+    \begin{plantuml}
+      @startuml
+      ProtelisVM o-- ExecutionContext : uses
+      ProtelisVM o- ProtelisProgram : executes
+      interface ExecutionContext
+      interface ProtelisProgram
+      class ProtelisVM
+      @enduml
+    \end{plantuml}
+    \caption{Relazione tra \texttt{ProtelisVM}, \texttt{ExecutionContext} e
+      \texttt{ProtelisProgram}.}
+  \label{fig:uml-protelisvm}
+\end{figure}
+
+\subsubsection{AbstractExecutionContext}
+L'interfaccia \texttt{ExecutionContext} contiene la definizione di molti metodi
+che dovrebbero essere comuni a tutte le implementazioni di Protelis. Questa
+entità astratta realizza quelle procedure delegando a una nuova entità, il
+\texttt{NetworkManager}, il compito di stabilire un metodo efficace di
+comunicazione.
+
+\subsubsection{NetworkManager}
+Astrazione di rete utilizzata dalla macchina virtuale Protelis: ad ogni
+iterazione, la macchina virtuale ha bisogno di accedere all'ultimo stato ricevuto
+dai vicini e di aggiornare lo stato che verrà inviato ad essi.
+
+Una considerazione importante da fare è che la documentazione ufficiale
+specifica che non è necessario che lo stato venga ricevuto o inviato ad ogni
+iterazione. La scelta della frequenza di aggiornamento dello stato è demandata
+alla specifica implementazione di questa interfaccia, per trovare il rapporto
+giusto tra efficienza e condivisione dello stato.
+
+\begin{figure}
+  \centering
+    \begin{plantuml}
+      @startuml
+      NetworkManager -o AbstractExecutionContext : features
+      ProtelisVM o- ExecutionContext : uses
+      ExecutionContext <|.. AbstractExecutionContext
+      interface NetworkManager
+      interface ExecutionContext
+      abstract class AbstractExecutionContext
+      @enduml
+    \end{plantuml}
+    \caption{Introduzione di \texttt{AbstractExecutionContext} e \texttt{NetworkManager}.}
+  \label{fig:uml-networkmanager}
+\end{figure}
+
+\subsection{Definizione di nuovi concetti}
+I concetti che seguono non fanno parte delle API di Protelis, ma sono stati
+definiti appositamente per estenderle e creare quindi un nuovo modello, che sia
+adatto a rappresentare dispositivi sia in un ambiente reale che in uno simulato.
+
+\subsubsection{Capacità di un dispositivo}
+L'obiettivo di questa entità è di realizzare un \texttt{ExecutionContext},
+traendo vantaggio delle funzioni già implementate in
+\texttt{AbstractExecutionContext}. Rappresenta le seguenti caratteristiche di un
+dispositivo:
+\begin{itemize}
+\item \textbf{Mantenere uno stato nel tempo}: ovvero essere in grado di
+  mantenere un insieme di variabili locali e aggiornarle in caso di necessità.
+\item \textbf{Comunicare con altri dispositivi}: capacità e protocolli, regole
+  utilizzate per effettuare uno scambio di informazioni con altri dispositivi
+  vicini. Per fare questo viene riutilizzato il concetto di
+  \texttt{NetworkManager} esistente in Protelis.
+\item \textbf{Interagire con l'ambiente}: possibilità di interagire con il
+  contesto da cui esso è circondato. In un contesto Internet-of-Things questo
+  corrisponde all'utilizzo di sensori o attuatori.
+\item \textbf{Eseguire funzioni definite dall'utente}: facoltà di definire
+  funzioni, comportamenti che possono essere richiamate all'occorrente durante
+  l'esecuzione del programma.
+\end{itemize}
+
+\begin{figure}
+  \centering
+    \begin{plantuml}
+      @startuml
+      Device *- DeviceCapabilities
+      DeviceCapabilities <|- AbstractExecutionContext
+      NetworkManager --* DeviceCapabilities
+      @enduml
+    \end{plantuml}
+    \caption{Introduzione di \texttt{DeviceCapabilities} e \texttt{Device}.}
+  \label{fig:uml-device}
+\end{figure}
 % Perché? A che bisogno risponde?
 %
 % Introduzione classi di Protelis
