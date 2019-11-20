@@ -22,7 +22,7 @@ define RMTARGET
 *.out \
 *.toc \
 *.idx \
-diagrams/output
+diagrams/output/*
 endef
 
 all: bibliography
@@ -46,4 +46,4 @@ $(PUMLSRC_DIR)/$(PUMLOUT_DIR)/%.png: $(PUMLSRC_DIR)/%.puml
 .PHONY: clean bibliography pre-bibliography diagrams
 
 clean:
-	$(RM) -rf $(RMTARGET)
+	$(RM) $(RMTARGET)
