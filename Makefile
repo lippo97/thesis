@@ -29,11 +29,8 @@ all: bibliography
 	$(ENV) $(CC) $(ARGS) $(TARGET)
 	$(ENV) $(CC) $(ARGS) $(TARGET)
 
-bibliography: pre-bibliography
+bibliography: one
 	$(BIB) $(basename $(TARGET))
-
-pre-bibliography:
-	$(ENV) $(CC) $(ARGS) $(TARGET)
 
 one: diagrams
 	$(ENV) $(CC) $(ARGS) $(TARGET)
@@ -43,7 +40,7 @@ diagrams: $(PUML_TARGETS)
 $(PUMLSRC_DIR)/$(PUMLOUT_DIR)/%.png: $(PUMLSRC_DIR)/%.puml
 	$(PUMLCC) $(PUMLFORMAT) $(basename $^).puml -o$(PUMLOUT_DIR)
 
-.PHONY: clean bibliography pre-bibliography diagrams
+.PHONY: clean bibliography diagrams one
 
 clean:
 	$(RM) $(RMTARGET)

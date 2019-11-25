@@ -1,0 +1,51 @@
+@startuml
+
+skinparam dpi 250
+actor ProtelisVM as PVM order 10
+participant DeviceCapabilities as DC order 20
+participant "sender : \nSocketNetworkManager" as SND order 30
+participant "receiver : \nSocketNetworkManager" as REC order 40
+
+actor PVM
+
+activate REC
+note over REC
+Il destinatario è stato
+precedentemente messo
+in ascolto tramite il suo
+metodo ""start()"".
+end note
+
+actor PVM
+PVM -> DC : commit()
+activate DC
+
+DC -> SND : shareState()
+activate SND
+
+SND -> REC : tcp_connect()
+activate REC
+REC --> SND : Ok
+
+SND -> REC : tcp_send(//message//)
+REC -> REC : receiveMessage(//message//)
+note over REC
+Salvataggio del messaggio
+ricevuto in una all'interno
+dell'oggetto, per poi essere
+restituito tramite
+""getNeighborState()""
+end note
+REC --> SND : Ok
+
+SND -> REC : tcp_close()
+deactivate REC
+
+DC <-- SND
+deactivate SND
+
+PVM <-- DC
+deactivate DC
+
+
+@enduml

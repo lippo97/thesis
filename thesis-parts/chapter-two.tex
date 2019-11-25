@@ -46,41 +46,38 @@ quadricotteri, disposti a griglia, volano a qualche centinaio di metri da
 terra. Essi fanno uso di comunicazione a corto raggio, 500 metri, per parlare
 con i dispositivi adiacenti.
 
-% TODO: Spiegare bene la parte del CodePath
 \section{Sistemi distribuiti}
-I costrutti fondanti della programmazione aggregata e i building block possono
-semplificare notevolmente il design e lo sviluppo di applicazioni in un contesto
-di Internet-of-Things\cite{DBLP:journals/computer/BealPV15}. Infatti consente di
-costruire, tramite composizione delle proprie API, delle applicazioni
-distribuite robuste e affidabili.
 
 Un sistema distribuito è una collezione di computer indipendenti che appare
 all'utente finale come un unico sistema coerente\cite{tanenbaum2016}.  Il
-concetto di indipendenza comporta che i dispositivi appartenenti al sistema non
-hanno risorse condivise, in particolare la memoria; allo stesso tempo questi
-devono raggiungere un obiettivo comune. Deve essere quindi prevista una modalità
-in cui questi componenti possano comunicare, per scambiarsi informazioni o
-coordinarsi.
+concetto di indipendenza implica che i dispositivi appartenenti al sistema non
+abbiano risorse condivise, in particolare la memoria; allo stesso tempo questi
+devono tenere un comportamento tra loro armonico. Deve essere quindi prevista
+una modalità in cui questi componenti possano comunicare, per scambiarsi
+informazioni e coordinarsi.
+
+I costrutti fondanti della programmazione aggregata e i building block possono
+semplificare notevolmente il design e lo sviluppo di applicazioni in un contesto
+di Internet-of-Things\cite{DBLP:journals/computer/BealPV15}. Essa infatti
+consente di costruire, tramite composizione delle proprie API, delle
+applicazioni distribuite robuste e affidabili.
 
 Al fine di eseguire macchine virtuali Protelis in un contesto distribuito è
-necessario implementare un modello di scambio di messaggi tra queste.
-L'architettura di Protelis (\ref{subsec:Architettura di Protelis}) è stata
-ideata avendo questo problema ben chiaro, pertanto è possibile estenderla
-facilmente, tramite l'implementazione di uno strato middleware, che si occupa
-ciò.
+necessario implementare un modello di scambio di messaggi tra queste (Figura
+\ref{fig:distributed-deployment}).  L'architettura di Protelis (Sezione
+\ref{subsec:Architettura di Protelis}) è stata ideata avendo questo problema ben
+chiaro, pertanto è possibile estenderla facilmente, tramite l'implementazione di
+uno strato middleware, che si occupi di ciò.
 
-% Serializzazione:
-% - time efficient
-% - hashing (probabilità molto bassa di errore)
-%
 
 % TODO: API Protelis qui o in architettura?
 \section{Architettura riusabile}
+\label{sec:model-def}
 L'obiettivo di questa sezione è di modellare una architettura del backend di
 Protelis abbastanza flessibile, che consenta di incorporare la macchina virtuale
 all'interno di un dispositivo, così che attraverso questo sia possibile
 eseguirne le iterazioni. Concretamente si effettuerà un mapping delle
-caratteristiche di un dispositivo (livello in basso nella figura
+caratteristiche di un dispositivo (livello in basso nella Figura
 \ref{fig:abstraction-layers}), così che queste possano essere utilizzate per
 implementare i costrutti del \textit{field calculus}. Un obiettivo importante di
 questo modello sarà circoscrivere in un'entità ben definita il concetto di
@@ -90,8 +87,8 @@ indipendentemente dal metodo specifico scelto per realizzarla.
 % TODO: da scrivere bene un'introduzione
 \subsection{API di Protelis}
 Le API del backend di Protelis sono scritte in Java, quindi sono facilmente
-integrabili anche con linguaggi eseguiti sulla Java Virtual Machine, per esempio
-come verrà mostrato in seguito Kotlin. Esse offrono le seguenti astrazioni.
+integrabili anche con linguaggi eseguiti sulla Java Virtual Machine. Esse
+offrono le seguenti astrazioni.
 
 \subsubsection{ExecutionContext}
 Interfaccia che si pone fra una macchina virtuale Protelis e l'ambiente da cui
@@ -127,9 +124,13 @@ entità astratta realizza quelle procedure delegando a una nuova entità, il
 comunicazione.
 
 \subsubsection{NetworkManager}
+\label{sec:network-manager}
 Astrazione di rete utilizzata dalla macchina virtuale Protelis: ad ogni
-iterazione, la macchina virtuale ha bisogno di accedere all'ultimo stato ricevuto
-dai vicini e di aggiornare lo stato che verrà inviato ad essi.
+iterazione, la macchina virtuale ha bisogno di accedere all'ultimo stato
+ricevuto dai vicini e di aggiornare lo stato che verrà inviato ad
+essi. L'implementazione di questa interfaccia è cruciale, infatti definisce le
+modalità di comunicazione tra i nodi della rete (Figura
+\ref{fig:uml-protelisvm}).
 
 Una considerazione importante da fare è che la documentazione ufficiale
 specifica che non è necessario che lo stato venga ricevuto o inviato ad ogni
@@ -139,22 +140,75 @@ giusto tra efficienza e condivisione dello stato.
 
 \begin{figure}
   \centering
-  % \def\svgscale{2}
   \includegraphics[width=\linewidth]{diagrams/output/networkmanager}
     \caption{Introduzione di \texttt{AbstractExecutionContext} e \texttt{NetworkManager}.}
   \label{fig:uml-networkmanager}
 \end{figure}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{diagrams/output/protelis-vm-sequence}
+  \caption{Rappresentazione attraverso un diagramma di sequenza UML di un ciclo
+    di esecuzione della macchina virtuale Protelis. Come si vede l'utilizzo di
+    diversi \texttt{NetworkManager} specializza il comportamento di tutto il
+    sistema.}
+    \label{fig:uml-protelisvm}
+\end{figure}
+
+
+% TODO:
+% Serializzazione:
+% - time efficient
+% - hashing (probabilità molto bassa di errore)
+\subsubsection{CodePath}
+Rappresenta un percorso, che parte dalla radice dell'albero di esecuzione della
+macchina virtuale Protelis e termina in uno dei nodi. Supportando la
+serializzazione, viene utilizzato per confrontare l'esecuzione locale a un nodo
+con quella dei propri vicini e permettere l'allineamento del codice.
+
+La specifica implementazione di questa classe è critica per la dimensione dei
+pacchetti generati dalla comunicazione tra i nodi. Sarà necessario, quindi,
+porre l'attenzione su questo aspetto quando la comunicazione sarà basata su
+protocolli di rete.
+
+All'interno delle API di Protelis sono già presenti due implementazioni di
+questa interfaccia:
+\begin{itemize}
+\item \texttt{DefaultTimeEfficientCodePath}: il cui algoritmo di generazione è
+  orientato alla velocità di esecuzione. L'output non è ottimizzato in termini
+  di spazio. Questa implementazione non dovrebbe essere utilizzata quindi per
+  l'utilizzo in una rete reale, perché potrebbe generare delle stringhe molto
+  lunghe, con conseguenti problemi di performance;
+\item \texttt{HashingCodePath}: il cui output dipende dall'algoritmo di hashing
+  utilizzato. L'algoritmo di generazione è orientato all'ottimizzazione dello
+  spazio, in quanto produce un output di lunghezza predicibile. Quindi è
+  l'implementazione consigliata per l'utilizzo in una rete reale. Questa
+  versione eredita dall'utilizzo delle funzioni di hashing il rischio di
+  collisioni, che diminuisce con l'utilizzo di funzioni più complesse. Spetta al
+  progettista la scelta della funzione di hashing che minimizzi le probabilità
+  di collisione, massimizzando l'efficienza in termini computazionali.
+\end{itemize}
+
 \subsection{Definizione di nuovi concetti}
 I concetti che seguono non fanno parte delle API di Protelis, ma sono stati
 definiti appositamente per estenderle e creare quindi un nuovo modello, che sia
 adatto a rappresentare dispositivi sia in un ambiente reale che in uno simulato.
+Questo modello rappresenta dunque una possibile base di partenza per la
+realizzazione di un backend di Protelis.
 
 \subsubsection{Capacità di un dispositivo}
+\label{sec:device-capabilities}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{diagrams/output/device}
+  \caption{Introduzione di \texttt{DeviceCapabilities} e \texttt{Device}.}
+  \label{fig:uml-device}
+\end{figure}
+
 L'obiettivo di questa entità è di realizzare un \texttt{ExecutionContext},
 traendo vantaggio delle funzioni già implementate in
-\texttt{AbstractExecutionContext}. Rappresenta le seguenti caratteristiche di un
-dispositivo:
+\texttt{AbstractExecutionContext}. Implementa le seguenti caratteristiche di un dispositivo:
 \begin{itemize}
 \item \textbf{Mantenere uno stato nel tempo}: ovvero essere in grado di
   mantenere un insieme di variabili locali e aggiornarle in caso di necessità.
@@ -163,22 +217,51 @@ dispositivo:
   vicini. Per fare questo viene riutilizzato il concetto di
   \texttt{NetworkManager} esistente in Protelis.
 \item \textbf{Interagire con l'ambiente}: possibilità di interagire con il
-  contesto da cui esso è circondato. In un contesto Internet-of-Things questo
-  corrisponde all'utilizzo di sensori o attuatori.
+  contesto da cui esso è circondato. In un contesto Internet-of-Things, per
+  esemio, questo potrebbe concretizzarsi con l'utilizzo di sensori o attuatori.
 \item \textbf{Eseguire funzioni definite dall'utente}: facoltà di definire
   funzioni, comportamenti che possono essere richiamate all'occorrente durante
   l'esecuzione del programma.
 \end{itemize}
 
+\subsubsection{Device}
+
+
+Un \texttt{Device} (o dispositivo) è un concetto che rappresenta un singolo
+dispositivo in una rete di nodi. Ciascuno di essi incorpora al proprio interno
+una macchina virtuale Protelis e sfutta le proprie capacità
+(\ref{sec:device-capabilities}), come l'interazione con l'ambiente esterno o la
+capacità di mantenere lo stato di una variabile, per supportare l'esecuzione di
+quest'ultima.
+
+Un dispositivo per funzionare ha bisogno di un'implementazione concreta di
+\texttt{NetworkManager} (\ref{sec:network-manager}), che viene specificata
+durante la creazione di uno specifico oggetto, seguendo il pattern strategy. In questo modo il concetto di
+dispositivo non è vincolato a uno specifico metodo di comunicazione. Nel
+capitolo successivo è presente una dimostrazione della sua riusabilità.
+
+\subsubsection{Speaker}
+Implementato sotto forma di strategia funzionale, rappresenta la capacità di un
+\texttt{Device} di pubblicare un messaggio, in un modo non definito dall'interfaccia, un
+messaggio. Questo verrà gestito e utilizzato in modalità differenti, secondo
+la strategia specificata.
+
+La sua implementazione più elementare è \texttt{ConsoleSpeaker}, che prevede che
+il messaggio venga stampato sullo standard output.
 \begin{figure}
   \centering
-  \includegraphics[width=\linewidth]{diagrams/output/device}
-    \caption{Introduzione di \texttt{DeviceCapabilities} e \texttt{Device}.}
-  \label{fig:uml-device}
+  \subfloat[Deployment in simulatore]{
+    \includegraphics[width=\linewidth]{diagrams/output/simulation-deployment}
+    \label{fig:simulation-deployment}
+  }\hfill
+  \subfloat[Deployment in ambiente distribuito]{
+    \includegraphics[width=\linewidth]{diagrams/output/distributed-deployment}
+    \label{fig:distributed-deployment}
+  }
+  \caption{Rappresentazione attraverso un diagramma UML di deployment delle due
+    differenti modalità di comunicazione utilizzate dal \texttt{NetworkManager}
+    in contesti distribuiti e simulati. Nella prima i dispositivi appartengono a
+    una memoria condivisa, possono usare questa per comunicare. Nella seconda
+    ciascun dispositivo appartiene a una diversa Java Virtual Machine, quindi
+    devono utilizzare un altro metodo per comunicare, per esempio le socket.}
 \end{figure}
-% Perché? A che bisogno risponde?
-%
-% Introduzione classi di Protelis
-% Strategy per Speaker e NetworkManager
-% Definizione di Device e DeviceCapabilities
-% Definizione modello riusabile

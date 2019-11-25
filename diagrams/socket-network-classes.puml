@@ -1,0 +1,30 @@
+@startuml
+
+skinparam dpi 250
+hide empty members
+
+Device "1" o- "1" NetworkManager : use
+NetworkManager <|.. SocketNetworkManager
+SocketNetworkManager "1" o-- "n" IPv4Host : neighborhood
+interface NetworkManager <<Interface>> {
+  +shareState(Map<CodePath, Object>) : void
+  +getNeighborState() : Map<DeviceUID, Map<CodePath, Object>>
+}
+
+class SocketNetworkManager {
+  +listen(): void
+  +stop(): void
+}
+note left
+""listen()"" e ""stop()"" consentono di avviare e fermare
+il server tcp contenuto all'interno di ogni oggetto
+end note
+class Device {
+  +getNetworkManager() : NetworkManager
+}
+class IPv4Host {
+  +hostname: String
+  +port: int
+}
+
+@enduml

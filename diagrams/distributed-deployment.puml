@@ -1,0 +1,43 @@
+@startuml
+
+skinparam dpi 250
+hide empty members
+
+node "__:Java Virtual Machine__" <<Device>> as JVM1 {
+    node "__:Device__" as D1 {
+
+	node "Protelis Virtual Machine" as PVM1
+	[NetworkManager] as NM1
+	PVM1 -(0- NM1
+    }
+}
+
+node "__:Java Virtual Machine__" <<Device>> as JVM2 {
+    node "__:Device__" as D2 {
+	node "Protelis Virtual Machine" as PVM2
+	[NetworkManager] as NM2
+	PVM2 -(0- NM2
+    }
+}
+
+
+node "__:Java Virtual Machine__" <<Device>> as JVM3 {
+    node "__:Device__" as D3 {
+	node "Protelis Virtual Machine" as PVM3
+	[NetworkManager] as NM3
+	PVM3 -(0- NM3
+    }
+}
+
+cloud Network
+
+NM1 -- Network
+NM2 -- Network
+NM3 -- Network
+
+note right of Network
+Il collegamento avviene tramite
+un protocollo di rete,come TCP,
+HTTP, MQTT.
+end note
+@enduml

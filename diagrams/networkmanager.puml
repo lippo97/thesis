@@ -1,6 +1,7 @@
 @startuml
 
 skinparam dpi 250
+hide empty members
 
 NetworkManager -o AbstractExecutionContext : features
 ProtelisVM o- ExecutionContext : uses

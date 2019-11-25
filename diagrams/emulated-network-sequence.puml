@@ -1,0 +1,24 @@
+@startuml
+
+skinparam dpi 250
+hide empty members
+
+actor ProtelisVM
+ProtelisVM -> DeviceCapabilities : commit()
+activate DeviceCapabilities
+
+DeviceCapabilities -> "sender : \nEmulatedNetworkManager" : shareState()
+activate "sender : \nEmulatedNetworkManager"
+
+"sender : \nEmulatedNetworkManager" -> "receiver : \nEmulatedNetworkManager" : receiveMessage(//message//)
+activate "receiver : \nEmulatedNetworkManager"
+note over "receiver : \nEmulatedNetworkManager": Il destinatario mantiene l'oggetto ricevuto\nal proprio interno, pronto ad essere\nrestituito alla chiamata del proprio\nmetodo ""getNeighborState()""
+"receiver : \nEmulatedNetworkManager" --> "sender : \nEmulatedNetworkManager"
+deactivate "receiver : \nEmulatedNetworkManager"
+
+DeviceCapabilities <-- "sender : \nEmulatedNetworkManager"
+deactivate "sender : \nEmulatedNetworkManager"
+
+ProtelisVM <-- DeviceCapabilities
+deactivate DeviceCapabilities
+@enduml

@@ -1,9 +1,10 @@
 @startuml
 
 skinparam dpi 250
+hide empty members
 
-ProtelisVM o-- ExecutionContext : uses
-ProtelisVM o- ProtelisProgram : executes
+ProtelisVM "1" o-- "1" ExecutionContext : uses
+ProtelisVM "1" o- "1" ProtelisProgram : executes
 interface ExecutionContext
 interface ProtelisProgram
 class ProtelisVM

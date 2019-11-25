@@ -1,0 +1,36 @@
+@startuml
+
+skinparam dpi 250
+hide empty members
+
+actor Device
+Device -> ProtelisVM : runCycle()
+activate ProtelisVM
+
+group Esecuzione del programma
+    ProtelisVM -> ExecutionContext : setup()
+    activate ExecutionContext
+    ProtelisVM -> ProtelisProgram : compute()
+    activate ProtelisProgram
+    ProtelisProgram -> ExecutionContext : <<apply changes>>
+    ProtelisProgram <-- ExecutionContext
+    ProtelisVM <-- ProtelisProgram
+    deactivate ProtelisProgram
+end
+group Applicazione di modifiche persistenti
+ProtelisVM -> ExecutionContext : commit()
+activate ExecutionContext
+
+ExecutionContext -> NetworkManager : shareState()
+activate NetworkManager
+
+ExecutionContext <-- NetworkManager
+deactivate NetworkManager
+
+ProtelisVM <-- ExecutionContext
+deactivate ExecutionContext
+end
+
+Device <-- ProtelisVM
+deactivate ProtelisVM
+@enduml

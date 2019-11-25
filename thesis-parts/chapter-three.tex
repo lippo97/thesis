@@ -1,4 +1,135 @@
 \chapter{Esempi applicativi}
+In questo capitolo viene provata la flessibilità del modello definito nella
+sezione \ref{sec:model-def}, offrendo tre diversi esempi di realizzazione di
+questo. In queste dimostrazioni sono presenti numerose semplificazioni, che
+servono per semplificare lo sviluppo e concentrarsi sui dettagli implementativi
+relativi a Protelis. Una di queste è che la simulazione inizia quando la rete ha
+già effettuato il meccanismo di discovery. Questo consente di fornire a ciascun
+dispositivo l'elenco dei propri vicini e concentrare l'attenzione sul
+\texttt{NetworkManager}, vero protagonista di questa fase.
+
+Le applicazioni sono state sviluppate parallelamente in Java e in Kotlin,
+utilizzando per entrambi un framework di testing, relativamente \textit{Junit} e
+\textit{Kotlintest}. In seguito i test sono stati agganciati ad una pipeline di
+continuous integration, offerta dal servizio gratuito
+TravisCI\footnote{https://travis-ci.org/}.
+
+Nelle sei simulazioni totali è stato riprodotto il medesimo scenario. In questo
+modo si può notare come l'implementazione del backend sia completamente
+trasparente al comportamento finale del sistema. Le seguenti simulazioni sono
+eseguite su una rete di cinque dispositivi emulati, disposti secondo topologia
+ad anello: ciascun dispositivo è quindi in grado
+di comunicare solo con quello a sé adiacente.
+
+\begin{minipage}{\linewidth}
+\lstinputlisting[caption={Hello, World! in Protelis.},
+label=lst:listato1]{code/hello.pt}
+\end{minipage}
+
+Il programma Protelis eseguito è un semplice HelloWorld (Listato
+\ref{lst:hello-protelis}). Nella prima parte il leader effettua un conteggio a
+ritroso. Nella seconda parte i dispositivi adiacenti al leader vengono salutati
+da questo.
+
+% Test svolti sempre uguale
+%
+% Numero di iterazioni
 \section{Simulatore personalizzato}
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{diagrams/output/emulated-network-classes}
+  \caption{Rappresentazione tramite diagramma UML delle classi della classe
+    \texttt{EmulatedNetworkManager}. Essa contiente un insieme di
+    \texttt{Device} vicini al \texttt{Device} a cui appartiene. Utilizza questi
+    riferimenti per inviare loro messaggi.}
+  \label{fig:emulated-network-classes}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{diagrams/output/emulated-network-sequence}
+  \caption{Rappresentazione attraverso un diagramma UML di sequenza di un ciclo di esecuzione della macchina virtuale Protelis.}
+    \label{fig:emulated-network-sequence}
+\end{figure}
+La prima implementazione che è stata realizzata è un simulatore.
+L'implementazione di Protelis già esistente in Alchemist, quella che utilizza
+la libreria NASA World Wind e quella già esistente nel vecchio repository di
+Protelis sono state la linea guida per lo sviluppo di questa versione, in
+quanto le strategie di comunicazione sono pressoché le stesse.
+
+In questa modalità i \texttt{Device} sono semplici oggetti eseguiti all'interno
+della stessa Java Virtual Machine (Figura \ref{fig:simulation-deployment}). Ne
+segue che ciascuno ha visibilità dell'altro in memoria e la comunicazione
+avviene, come di consueto nella programmazione ad oggetti, tramite le chiamate
+ai metodi; il contenuto dei messaggi è passato come argomento di questi ultimi.
+
+Nello specifico è stata realizzata la classe \texttt{EmulatedNetworkManager},
+che simula il comportamento che il \texttt{NetworkManager} avrebbe in una rete
+reale. Ciascun \texttt{EmulatedNetworkManager} contiene una lista di
+\texttt{Device} vicini(Figura \ref{fig:emulated-network-classes}). Il meccanismo
+utilizzato per l'allineamento del codice in fase di esecuzione prevede lo
+scambio di un oggetto di tipo \texttt{Map<CodePath, Object>}.
+Questo viene passato attraverso un apposito metodo per ricevere un messaggio
+dall'esterno, utilizzato nel momento in cui ad un dispositivo viene richiesto di
+scambiare lo stato con altri dispositivi (Figura
+\ref{fig:emulated-network-sequence}).
+
 \section{Comunicazione su rete IP}
-\section{Protocolli orientati all'IOT}
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{diagrams/output/socket-network-classes}
+  \caption{Rappresentazione tramite diagramma UML delle classi della classe
+    \texttt{SocketNetworkManager}.}
+  \label{fig:socket-network-classes}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{diagrams/output/socket-network-sequence}
+  \caption{Rappresentazione tramite diagramma UML di sequenza}
+  \label{fig:socket-network-sequence}
+\end{figure}
+Questa versione realizza il modello di deployment descritto dalla figura
+\ref{fig:distributed-deployment}. È stata fatta però una semplificazione
+rispetto a quel diagramma: i \texttt{Device} non sono eseguiti in macchine
+virtuali Java distinte. Per simulare il fatto che lo siano essi non possono
+accedere a zone di memoria condivise, in particolare non possono richiamare i
+rispettivi metodi. Per comunicare è necessario che essi utilizzino metodi
+alternativi, per esempio che utilizzino la rete IP come tramite. In questo
+esempio il passaggio dell'oggetto \texttt{Map<CodePath, Object>} avviene tramite
+l'utilizzo di socket TCP. Il protocollo
+TCP\footnote{https://tools.ietf.org/html/rfc0793} è un protocollo di rete di
+livello trasporto, orientato alla connessione, che utilizza un'architettura
+client-server e che garantisce un canale affidabile di comunicazione tra due
+applicazioni su host distinti. La comunicazione avviene nel seguente modo: un
+server si mette in ascolto su una determinata porta; un client invia al server
+una richiesta di connessione su quella porta. A questo punto il server accetta
+la connessione e viene stabilito un canale di comunicazione affidabile, che può
+essere utilizzato per lo scambio in entrambe le direzioni di flussi di dati. La
+connessione può essere terminata in qualsiasi momento da uno degli host.
+
+La classe che utilizza le socket è denominata \texttt{SocketNetworkManager}. In
+questa versione ciascun \texttt{SocketNetworkManager} contiene al proprio
+interno una lista di tuple nella forma \textit{(hostname, porta)}, che
+rappresentano i vicini del dispositivo che lo contiene. Ciascuno di essi svolge
+un duplice compito di server e client: il primo consiste nel rimanere in ascolto
+di connessioni entranti per ricevere messaggi; il secondo comporta stabilire
+connessioni con altri \texttt{SocketNetworkManager} quando deve inviare un
+messaggio. Una volta che la connessione è stabilita il mittente invia l'oggetto
+\texttt{Map<CodePath, Object>} al destinatario, che poi procede a memorizzarlo.
+
+Per permettere il passaggio di un oggetto tramite un protocollo di rete è
+necessario effettuare una serializzazione dell'oggetto, ovvero una conversione
+dello stato di un oggetto in una serie di byte, cosicché questo possa essere
+memorizzato o, in questo caso, trasferito tramite la rete sotto forma di stream
+di dati. Una volta giunto a destinazione questo viene de-serializzato, in modo
+da poter ricostruire un oggetto replica dell'originale. I principali metodi
+utilizzabili per la serializzazione di oggetti sono: Protocol
+Buffers\footnote{https://developers.google.com/protocol-buffers}, JSON, YAML,
+Kryo\footnote{https://github.com/EsotericSoftware/kryo},
+Elsa\footnote{https://github.com/jankotek/elsa}, etc.. In questa demo, per
+motivi di semplificazione, è stata utilizzato il meccanismo di serializzazione
+già presente in Java: l'interfaccia \texttt{Serializable}, che, per quanto non
+efficiente come come le altre già citate, soddisfa pienamente le necessità del
+progetto.
+
+% In realtà qui i dispositivi stanno sulla stessa JVM
+\section{Protocolli orientati all'Internet-of-Things}

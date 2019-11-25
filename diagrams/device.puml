@@ -1,8 +1,11 @@
 @startuml
 
 skinparam dpi 250
+hide empty members
 
-Device *- DeviceCapabilities
+Device "1" *- "1" DeviceCapabilities
 DeviceCapabilities <|- AbstractExecutionContext
-NetworkManager --* DeviceCapabilities
+NetworkManager "1" --* "1" DeviceCapabilities
+abstract class AbstractExecutionContext
+interface NetworkManager
 @enduml
