@@ -47,7 +47,8 @@ da questo.
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{diagrams/output/emulated-network-sequence}
-  \caption{Rappresentazione attraverso un diagramma UML di sequenza di un ciclo di esecuzione della macchina virtuale Protelis.}
+  \caption{Rappresentazione attraverso un diagramma UML di sequenza l'uso
+    dell'entità \texttt{EmulatedNetworkManager}.}
     \label{fig:emulated-network-sequence}
 \end{figure}
 La prima implementazione che è stata realizzata è un simulatore.
@@ -72,30 +73,37 @@ Questo viene passato attraverso un apposito metodo per ricevere un messaggio
 dall'esterno, utilizzato nel momento in cui ad un dispositivo viene richiesto di
 scambiare lo stato con altri dispositivi (Figura
 \ref{fig:emulated-network-sequence}).
+L'implementazione del \texttt{CodePath} scelta per questa versione è
+\texttt{DefaultTimeEfficientCodePath}, in quanto la dimensione di questo oggetto
+non è rilevante, poiché questo viene semplicemente referenziato in memoria,
+senza necessità di effettuarne copie.
 
 \section{Comunicazione su rete IP}
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{diagrams/output/socket-network-classes}
-  \caption{Rappresentazione tramite diagramma UML delle classi della classe
+  \caption{Rappresentazione tramite diagramma UML delle classi dell'entità
     \texttt{SocketNetworkManager}.}
   \label{fig:socket-network-classes}
 \end{figure}
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{diagrams/output/socket-network-sequence}
-  \caption{Rappresentazione tramite diagramma UML di sequenza}
+  \caption{Rappresentazione tramite diagramma UML di sequenza del comportamento
+    della classe \texttt{SocketNetworkManager}.}
   \label{fig:socket-network-sequence}
 \end{figure}
-Questa versione realizza il modello di deployment descritto dalla figura
-\ref{fig:distributed-deployment}. È stata fatta però una semplificazione
-rispetto a quel diagramma: i \texttt{Device} non sono eseguiti in macchine
-virtuali Java distinte. Per simulare il fatto che lo siano essi non possono
-accedere a zone di memoria condivise, in particolare non possono richiamare i
-rispettivi metodi. Per comunicare è necessario che essi utilizzino metodi
-alternativi, per esempio che utilizzino la rete IP come tramite. In questo
-esempio il passaggio dell'oggetto \texttt{Map<CodePath, Object>} avviene tramite
-l'utilizzo di socket TCP. Il protocollo
+Questa versione realizza una versione distribuita del backend di Protelis.  È
+stata fatta però una semplificazione rispetto a quanto descritto dal diagramma
+presente nella Figura \ref{fig:distributed-deployment}): i \texttt{Device} non
+sono eseguiti in macchine virtuali Java distinte. Per simulare il fatto che lo
+siano essi non possono accedere a zone di memoria condivise, in particolare non
+possono richiamare i rispettivi metodi. Per comunicare è necessario che essi
+utilizzino metodi alternativi, per esempio che utilizzino la rete IP come
+tramite.
+
+In questo esempio il passaggio dell'oggetto \texttt{Map<CodePath, Object>}
+avviene tramite l'utilizzo di socket TCP. Il protocollo
 TCP\footnote{https://tools.ietf.org/html/rfc0793} è un protocollo di rete di
 livello trasporto, orientato alla connessione, che utilizza un'architettura
 client-server e che garantisce un canale affidabile di comunicazione tra due
@@ -131,5 +139,67 @@ già presente in Java: l'interfaccia \texttt{Serializable}, che, per quanto non
 efficiente come come le altre già citate, soddisfa pienamente le necessità del
 progetto.
 
-% In realtà qui i dispositivi stanno sulla stessa JVM
+L'implementazione di \texttt{CodePath} utilizzata in questa demo è
+\texttt{HashingCodePath}, in quanto l'oggetto necessita di essere serializzato e
+trasferito successivamente tramite la rete. È conveniente dunque che la
+dimensione finale di questo sia predicibile a priori.
+
 \section{Protocolli orientati all'Internet-of-Things}
+Come già ampiamente discusso, le caratteristiche della programmazione aggregata
+forniscono una risposta eccellente alle richieste di campi in via di sviluppo
+sempre maggiori, quali Internet-of-Things e reti di sensori, per esempio. È
+importante che l'architettura definita possa supportare le tecnologie e i
+protocolli utilizzati in questi ambiti, come MQTT\footnote{http://mqtt.org/},
+Stomp\footnote{https://stomp.github.io/},
+CoAP\footnote{https://coap.technology/}, etc.. In questa sezione viene mostrata
+un'implementazione \texttt{NetworkManager} che sfrutta il protocollo MQTT, per
+permettere al proprio dispositivo di comunicare con gli altri nodi della rete.
+
+Il protocollo MQTT è un protocollo nato per l'utilizzo nell'ambito
+Internet-of-Things e comunicazione \textit{machine-to-machine}, che risulta molto
+efficiente nell'utilizzo della banda di connessione a disposizione. Utilizza il
+modello \textit{publish/subscribe}. Questo prevede la presenza di un broker di
+messaggistica, un nodo centrale attraverso il quale i client possono registrarsi
+per essere notificati di determinati \textit{topic} (argomenti). In qualsiasi
+momento un nodo può registrarsi a un nuovo argomento di interesse o inviare un
+messaggio a uno di questi. Nel momento in cui il broker riceve un nuovo
+messaggio relativo ad un argomento, notifica tutti i client che si erano
+registrati ad esso in precedenza. Questo approccio consente di disaccoppiare la
+produzione del messaggio dalla sua accettazione, rendendo la comunicazione
+asincrona.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{diagrams/output/mqtt-network-classes}
+  \caption{Rappresentazione tramite diagramma UML delle classi dell'entità
+    \texttt{MqttNetworkManager}.}
+  \label{fig:emulated-network-classes}
+\end{figure}
+
+La classe che utilizza questo protocollo si chiama
+\texttt{MqttNetworkManager}. Come la classe \texttt{SocketNetworkManager}
+descritta in precedenza, anche questa ha una duplice funzione. La prima è quella
+di essere a disposizione per ricevere messaggi: questo avviene mediante la
+registrazione, presso un broker centrale, relativa ai messaggi destinati a sé
+stesso. La seconda è quella di inviare messaggi agli altri nodi. Per fare questo
+ciascun \texttt{MqttNetworkManager} contiene al proprio interno una lista di
+argomenti a cui inviare messaggi, uno per ogni vicino; nel momento in cui gli
+viene richiesto di inviare l'oggetto \texttt{Map<CodePath, Object>} agli altri
+nodi esso lo invia, una volta per ogni argomento, dopo opportuna
+serializzazione, al broker di messaggistica, che provvederà a diffondere il
+messaggio ai rispettivi destinatari.
+
+Anche in questa versione sono state fatte molte delle scelte effettuate per
+quella precedente: i \texttt{Device} sono eseguiti all'interno della stessa Java
+Virtual Machine, ma si comportano come se non lo fossero; il serializzatore
+scelto è stato quello già predefinito in Java; l'implementazione di
+\texttt{CodePath} utilizzata è la stessa, per la stessa ragione.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{diagrams/output/mqtt-network-sequence}
+  \caption{Rappresentazione attraverso un diagramma UML di sequenza dell'uso
+    della classe \texttt{MqttNetworkManager}. La fase di trasmissione di un
+    messaggio è ripetuta per ogni dispositivo vicino.}
+    .\label{fig:emulated-network-sequence}
+\end{figure}

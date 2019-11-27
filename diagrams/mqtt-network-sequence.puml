@@ -1,0 +1,50 @@
+@startuml
+
+skinparam dpi 250
+actor ProtelisVM as PVM order 10
+participant DeviceCapabilities as DC order 20
+participant "C1 :\nMqttNetworkManager" as C1 order 30
+participant "MQTT Broker" as BRO order 40
+participant "c2 :\nMqttNetworkManager" as C2 order 50
+
+group Setup
+C1 -> BRO : subscribe("C1")
+C2 -> BRO : subscribe("C2")
+end group
+
+group Trasmissione di un messaggio
+PVM -> DC : commit()
+activate DC
+
+DC -> C1 : shareState(//message//)
+activate C1
+
+C1 -> BRO : publish("C2", //message//)
+
+DC <-- C1
+deactivate C1
+
+PVM <-- DC
+deactivate DC
+
+BRO -> C2 : notify("C2", //message//)
+activate C2
+
+C2 -> C2 : receiveMessage(//message//)
+
+note over C2
+Il contenuto di //message//
+viene salvato per essere fruito
+in seguito tramite il metodo
+""getNeighborState()""
+end note
+deactivate C2
+
+
+
+end group
+
+
+
+
+@enduml
