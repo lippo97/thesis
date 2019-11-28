@@ -14,6 +14,10 @@
 *.pdf
 *-plantuml*
 *~
+diagrams/output
+*.bbl
+*.blg
+*.idx
 .#*
 # Ignore my notes
 notes.org
