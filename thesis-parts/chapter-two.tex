@@ -1,33 +1,33 @@
 \chapter{Architettura riusabile per backend di Protelis}
 \section{Piattaforme di simulazione}
-L'architettura utilizzata per Protelis si dimostra flessibile, adatta alla
-portabilità su diversi sistemi reali\cite{Clark2015} e simulati quali
-Alchemist\cite{alchemist} (Figura 3b) e NASA World Wind\cite{Bell2007}.
+L'architettura utilizzata per Protelis promette di essere flessibile, adatta
+alla portabilità su diversi sistemi reali\cite{Clark2015} e simulati quali
+Alchemist\cite{alchemist} e NASA World Wind\cite{Bell2007}.
 
-L'architettura utilizzata per Protelis si dimostra flessibile, adatta alla
-portabilità su diverse piattaforme. Per fare ciò è necessario realizzare un
-backend che definisca i meccanismi di comunicazione tra i dispositivi e
-gestisca l'esecuzione della macchina virtuale Protelis.
+Alla base dell'elevata portabilità vi è un'architettura a due livelli, che
+mantiene separati interprete e infrastruttura, e che richiede di implementare
+determinate interfacce al fine di difinire i meccanismi di comunicazione tra i
+dispositivi.
 
-% TODO: Descrizione di alchemist migliore
 \subsection{Alchemist}
 \begin{figure}
   \centering
   \includegraphics[width=0.7\linewidth]{images/alchemist-architecture.png}
   \caption{Implementazione di Protelis utilizzata in Alchemist.}
+  \label{fig:alchemist-architecture}
 \end{figure}
-Tra le realizzazioni esistenti l'esempio più rilevante è
-Alchemist\footnote{https://alchemistsimulator.github.io/}: un simulatore per
+Tra le piattaforme esistenti l'esempio più rilevante è
+Alchemist\cite{alchemist}: un simulatore per
 computazione pervasiva, aggregata e ispirata alla natura. Esso utilizza al
 proprio interno un meta-modello nel quale dispositivi vicini e interconnessi
 comunicano seguendo un insieme di leggi ispirate al mondo della chimica.
 
-Alchemist prevede la probabilità di utilizzare incarnazioni, ovvero
+Alchemist prevede la possibilità di utilizzare incarnazioni, ovvero
 implementazioni concrete del proprio meta-modello per modellare uno specifico
 concetto di interesse. Una di queste incarnazioni è quella che consente al
 simulatore di eseguire un programma Protelis all'interno della propria
 infrastruttura, che permette di creare e gestire una rete di nodi simulati
-(Figura /ref{fig:alchemist-architettura}).
+(Figura \ref{fig:alchemist-architettura}).
 
 \subsection{NASA World Wind}
 NASA World Wind\footnote{https://worldwind.arc.nasa.gov/} è un progetto
@@ -35,7 +35,7 @@ open-source cross-platform sviluppato dalla NASA, che offre un'interfaccia di
 programmazione per creare, in maniera rapida, delle visualizzazioni 3D
 interattive di un globo virtuale. Si differenzia da altri software simili come
 Google Earth\footnote{https://www.google.it/intl/it/earth/} perché non è una
-semplice applicazione, piuttosto un'intera SDK che può essere utilizzata come
+semplice applicazione, piuttosto un SDK che può essere utilizzata come
 base per costruire una propria applicazione.
 
 È stato utilizzato per dimostrare come Protelis possa essere uno strumento che
@@ -60,18 +60,16 @@ I costrutti fondanti della programmazione aggregata e i building block possono
 semplificare notevolmente il design e lo sviluppo di applicazioni in un contesto
 di Internet-of-Things\cite{DBLP:journals/computer/BealPV15}. Essa infatti
 consente di costruire, tramite composizione delle proprie API, delle
-applicazioni distribuite robuste e affidabili.
-
-Al fine di eseguire macchine virtuali Protelis in un contesto distribuito è
-necessario implementare un modello di scambio di messaggi tra queste (Figura
+applicazioni distribuite robuste e affidabili. Al fine di eseguire macchine
+virtuali Protelis in un contesto distribuito è necessario implementare un
+modello di scambio di messaggi tra queste (Figura
 \ref{fig:distributed-deployment}).  L'architettura di Protelis (Sezione
 \ref{subsec:Architettura di Protelis}) è stata ideata avendo questo problema ben
 chiaro, pertanto è possibile estenderla facilmente, tramite l'implementazione di
-uno strato middleware, che si occupi di ciò.
+uno strato middleware.
 
 
-% TODO: API Protelis qui o in architettura?
-\section{Architettura riusabile}
+\section{Modellazione di un'architettura riusabile}
 \label{sec:model-def}
 L'obiettivo di questa sezione è di modellare una architettura del backend di
 Protelis abbastanza flessibile, che consenta di incorporare la macchina virtuale
@@ -84,11 +82,10 @@ questo modello sarà circoscrivere in un'entità ben definita il concetto di
 strategia di comunicazione. In questo modo il device sarà in grado di funzionare
 indipendentemente dal metodo specifico scelto per realizzarla.
 
-% TODO: da scrivere bene un'introduzione
 \subsection{API di Protelis}
-Le API del backend di Protelis sono scritte in Java, quindi sono facilmente
-integrabili anche con linguaggi eseguiti sulla Java Virtual Machine. Esse
-offrono le seguenti astrazioni.
+Le API del backend di Protelis sono scritte in Java, ma sono facilmente
+integrabili anche con altri linguaggi eseguiti sulla Java Virtual Machine, ed
+espongono un insieme di astrazioni volte a modellare il dispositivo.
 
 \subsubsection{ExecutionContext}
 Interfaccia che si pone fra una macchina virtuale Protelis e l'ambiente da cui
@@ -120,8 +117,7 @@ l'esterno. L'interfaccia permette di azionarne i cicli di esecuzione.
 L'interfaccia \texttt{ExecutionContext} contiene la definizione di molti metodi
 che dovrebbero essere comuni a tutte le implementazioni di Protelis. Questa
 entità astratta realizza quelle procedure delegando a una nuova entità, il
-\texttt{NetworkManager}, il compito di stabilire un metodo efficace di
-comunicazione.
+\texttt{NetworkManager}, il compito di stabilire il metodo di comunicazione.
 
 \subsubsection{NetworkManager}
 \label{sec:network-manager}
@@ -156,10 +152,6 @@ giusto tra efficienza e condivisione dello stato.
 \end{figure}
 
 
-% TODO:
-% Serializzazione:
-% - time efficient
-% - hashing (probabilità molto bassa di errore)
 \subsubsection{CodePath}
 Rappresenta un percorso, che parte dalla radice dell'albero di esecuzione della
 macchina virtuale Protelis e termina in uno dei nodi. Supportando la
@@ -189,11 +181,15 @@ questa interfaccia:
   di collisione, massimizzando l'efficienza in termini computazionali.
 \end{itemize}
 
-\subsection{Definizione di nuovi concetti}
-I concetti che seguono non fanno parte delle API di Protelis, ma sono stati
-definiti appositamente per estenderle e creare quindi un nuovo modello, che sia
-adatto a rappresentare dispositivi sia in un ambiente reale che in uno simulato.
-Questo modello rappresenta dunque una possibile base di partenza per la
+\subsection{Modellazione di un dispositivo e le sue capacità}
+Protelis non si cura di modellare il concetto di dispositivo. Le entità che
+offre non sono progettate per fornire un'architettura riusabile.  Il contributo
+di questa tesi è di presentare un modello che consenta di definire
+esplicitamente le capacità di un dispositivo in una singola entità, utilizzata
+in seguito da un dispositivo. Questo modello offre i vantaggi della
+programmazione ad oggetti, come la semplicità di estendere una classe. Questo
+modello è adatto a rappresentare dispositivi sia in un ambiente reale che in uno
+simulato, e rappresenta dunque una possibile base di partenza riusabile per la
 realizzazione di un backend di Protelis.
 
 \subsubsection{Capacità di un dispositivo}
@@ -206,7 +202,7 @@ realizzazione di un backend di Protelis.
   \label{fig:uml-device}
 \end{figure}
 
-L'obiettivo di questa entità è di realizzare un \texttt{ExecutionContext},
+L'obiettivo di \texttt{DeviceCapabilities} è di realizzare un \texttt{ExecutionContext},
 traendo vantaggio delle funzioni già implementate in
 \texttt{AbstractExecutionContext}. Implementa le seguenti caratteristiche di un dispositivo:
 \begin{itemize}
@@ -218,7 +214,7 @@ traendo vantaggio delle funzioni già implementate in
   \texttt{NetworkManager} esistente in Protelis.
 \item \textbf{Interagire con l'ambiente}: possibilità di interagire con il
   contesto da cui esso è circondato. In un contesto Internet-of-Things, per
-  esemio, questo potrebbe concretizzarsi con l'utilizzo di sensori o attuatori.
+  esempio, questo potrebbe concretizzarsi con l'utilizzo di sensori o attuatori.
 \item \textbf{Eseguire funzioni definite dall'utente}: facoltà di definire
   funzioni, comportamenti che possono essere richiamate all'occorrente durante
   l'esecuzione del programma.
@@ -227,30 +223,29 @@ traendo vantaggio delle funzioni già implementate in
 \subsubsection{Device}
 
 
-Un \texttt{Device} (o dispositivo) è un concetto che rappresenta un singolo
-dispositivo in una rete di nodi. Ciascuno di essi incorpora al proprio interno
-una macchina virtuale Protelis e sfutta le proprie capacità
-(\ref{sec:device-capabilities}), come l'interazione con l'ambiente esterno o la
-capacità di mantenere lo stato di una variabile, per supportare l'esecuzione di
-quest'ultima.
+Un \texttt{Device} è un concetto che rappresenta un singolo dispositivo in una
+rete di nodi. Ciascuno di essi incorpora al proprio interno una macchina
+virtuale Protelis ed espone le proprie capacità (\ref{sec:device-capabilities}),
+come la capacità di interagire con l'ambiente esterno o quella di mantenere lo
+stato di una variabile d'ambiente.
 
 Un dispositivo per funzionare ha bisogno di un'implementazione concreta di
 \texttt{NetworkManager} (\ref{sec:network-manager}), che viene specificata
-durante la creazione di uno specifico oggetto, seguendo il pattern strategy. In questo modo il concetto di
-dispositivo non è vincolato a uno specifico metodo di comunicazione. Nel
-capitolo successivo è presente una dimostrazione della sua riusabilità.
+durante la creazione di uno specifico oggetto, seguendo il pattern strategy
+\cite{Gamma:1995:DPE:186897}. In questo modo il concetto di dispositivo non è
+vincolato a uno specifico metodo di comunicazione. Nel capitolo successivo è
+presente una dimostrazione della sua riusabilità.
 
 \subsubsection{Speaker}
-Implementato sotto forma di strategia funzionale, rappresenta la capacità di un
+Implementazione d'esempio di una \textit{capability}, rappresenta la capacità di un
 \texttt{Device} di pubblicare un messaggio, in un modo non definito dall'interfaccia, un
-messaggio. Questo verrà gestito e utilizzato in modalità differenti, secondo
-la strategia specificata.
+messaggio.
 
 La sua implementazione più elementare è \texttt{ConsoleSpeaker}, che prevede che
 il messaggio venga stampato sullo standard output.
 \begin{figure}
   \centering
-  \subfloat[Deployment in simulatore]{
+  \subfloat[Deployment in ambiente simulato]{
     \includegraphics[width=\linewidth]{diagrams/output/simulation-deployment}
     \label{fig:simulation-deployment}
   }\hfill

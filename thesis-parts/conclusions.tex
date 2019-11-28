@@ -1,44 +1,39 @@
 \chapter{Conclusioni e lavori futuri}
 \section{Conclusioni}
-È stato introdotta la programmazione aggregata come una possibile soluzione a
-numerosi problemi relativi ai sistemi distribuiti moderni. In particolare si è
-posta l'attenzione su come il \textit{field calculus} possa formalizzare, quindi
-rendere analizzabili questi problemi. Quindi è stato proposto Protelis, come
-implementazione del \textit{field calculus}, che per la sua toolchain, le sue
-caratteristiche e la sua portabilità rappresenta un linguaggio protagonista in
-questo settore.
+La programmazione aggregata è un approccio promettente alla risoluzione di
+numerosi problemi relativi ai sistemi distribuiti moderni come IoT, reti di
+sensori, eccetera.
 
 Partendo dalle API esistenti di Protelis, è stato definito un modello riusabile
 che consente di eseguire una macchina virtuale Protelis su diverse
 infrastrutture, che possono essere reti reali, come nell'Internet-of-Things
-oppure simulate (come nel caso di Alchemist).  Per fare ciò si è dovuto
-introdurre il concetto di middleware, uno strato che si occupa della
-comunicazione tra i nodi in maniera completamente trasparente ad essi, ovvero in
-modo che se l'implementazione di questo cambia, il comportamento finale del
-sistema rimane lo stesso. Quindi per isolare il concetto di comunicazione tra
-dispositivi dalle entità esistenti, si è fatto uso del concetto, già definito
-dalle API di Protelis, \texttt{NetworkManager}, che fornisce una maniera molto
-semplice di realizzare lo scambio di messaggi.
+oppure simulate (come nel caso di Alchemist). Per fare ciò si è dovuto
+introdurre uno strato che si occupasse della comunicazione tra i nodi in maniera
+completamente trasparente ad essi, ovvero in modo che se l'implementazione di
+questo cambiasse, il comportamento finale del sistema rimarrebbe lo stesso. Quindi, per
+isolare il concetto di comunicazione tra dispositivi dalle entità esistenti, si
+è fatto uso del concetto già definito dalle API di Protelis di
+\texttt{NetworkManager}, che fornisce una maniera molto semplice di realizzare
+lo scambio di messaggi.
 
-A sostegno di questo modello, sono stati portati tre diversi esempi che
-rappresentano tre diverse realtà in cui il linguaggio Protelis può essere
-utilizzato. In particolare il primo mira a creare un ambiente simulato, dove
-viene eseguita una simulazione di una rete reale i cui nodi eseguono una
-macchina virtuale Protelis; il secondo mostra come l'architettura di Protelis
-possa essere facilmente estesa ad un sistema distribuito, supportando la
-comunicazione attraverso la rete IP; infine il terzo implementa l'uso di uno dei
-protocolli più utilizzati in ambito Internet-of-Things, settore in cui il
-linguaggio Protelis è sicuramente competitivo.
+A verifica della flessibilità del modello proposto, sono stati portati tre
+diversi esempi che rappresentano tre diverse realtà in cui il linguaggio
+Protelis può essere utilizzato. In particolare, il primo mira a creare una
+simulazione di una rete reale i cui nodi eseguono una macchina virtuale
+Protelis; il secondo mostra come l'architettura di Protelis possa essere
+facilmente estesa ad un sistema distribuito, supportando la comunicazione
+attraverso la rete IP; infine il terzo implementa l'uso di uno dei protocolli
+più utilizzati in ambito IoT.
 
 Gli elaborati prodotti sono stati integrati come esempi al repository ufficiale
-di Protelis\footnote{https://github.com/Protelis/Protelis-Demo}. Rappresentano
-il punto di partenza per chiunque voglia implementare un nuovo backend del
-linguaggio.
+di Protelis\footnote{https://github.com/Protelis/Protelis-Demo} e rappresentano
+un possibile punto di partenza per chiunque voglia implementare un nuovo backend
+del linguaggio.
 
 \section{Lavori futuri}
 Gli elaborati proposti in questa tesi sono facilmente estendibili. Di seguito
 vengono elencati alcuni suggerimenti, per evolvere le demo esistenti o per
-svilupparne di nuove, che potranno essere presi in considerazione.  Migliorare
+svilupparne di nuove. Migliorare
 la demo è molto facile: è sufficiente fare un
 \textit{fork}\footnote{https://help.github.com/en/github/getting-started-with-github/fork-a-repo}
 del repository ufficiale della demo di Protelis, effettuare delle modifiche e
@@ -60,52 +55,46 @@ di dispositivi è il controllo di uno sciame di droni. Infatti, garantendo
 ciascuno il controllo della propria posizione nel tempo, ma descrivendone il
 comportamento in maniera collettiva, è relativamente semplice prevenire
 qualsiasi tipo di collisione, fornendo la possibilità di creare comportamenti o
-coreografie in maniera efficace.  Protelis fornisce supporto per l'impiego delle
+coreografie in maniera efficace \cite{7789463}.  Protelis fornisce supporto per l'impiego delle
 funzioni relative allo spazio e al tempo tramite le interfacce
 \texttt{SpatiallyEmbeddedDevice} e \texttt{TimeAwareDevice}.
 
-\subsection{Migliorare isolamento}
-Nell'architettura proposta nel corso di questa tesi, alcune classi possono
-essere difficilmente estendibili, per esempio se si volesse estendere la classe
-\texttt{DeviceCapabilities} di un \texttt{Device} per implementare
-\texttt{TimeAwareDevice}, un oggetto generico capace di lavorare con le unità
-temporali, si troverebbero difficoltà a farlo in maniera semplice, ma sarebbe
-necessario estendere \texttt{DeviceCapabilities}. Se volessimo a quel punto
-implementare \texttt{SpatiallyEmbeddedDevice}, un oggetto consapevole della
-propria posizione nello spazio, sulle stesse capacità dell'oggetto, ci
-troveremmo di nuovo a dover estendere la classe esistente. Un altro caso
-interessante è l'impossibilità di utilizzare uno \texttt{DeviceUID} che non sia
-implementato tramite un numero intero.  Potrebbe essere quindi eseguita
-un'operazione di refactoring di tutta la codebase, con la finalità di
-estrapolare e isolare questi comportamenti in una sola classe, come già
-effettuato con la classe \texttt{NetworkManager}, in modo da poterne utilizzare
-di diversi in base alle richieste specifiche di un problema. Il pattern strategy
-si presta molto bene a questo tipo di esigenze.
+\subsection{Refactoring della build}
+L'elaborato prodotto utilizza Gradle\footnote{https://gradle.org/}, uno
+strumento di build automation, per la gestione di sei sottoprogetti, che
+consente di controllare in maniera centralizzata l'esecuzione di alcune attività
+relative ad essi, come l'esecuzione dei test o la produzione della documentazione.
 
-\subsection{Ulteriori template}
+Nella configurazione attuale, in entrambi i linguaggi utilizzati, l'architettura
+riusabile modellata nel corso della tesi è definita solo nel sottoprogetto che
+descrive il primo scenario di esempio. Per poterne fare uso, gli altri due
+sottoprogetti, tramite una funzionalità di Gradle, importano direttamente i file
+sorgenti dal primo. Questa configurazione può essere migliorata introducendo un
+nuovo sottoprogetto, nel quale possano essere isolate le parti comuni definite
+in questa tesi, che possa essere importato da tutti gli altri.
+
+
+\subsection{Produzione di ulteriori template}
 Si è visto che l'architettura prodotta, per mezzo dell'entità
-\texttt{NetworkManager}, si presta all'utilizzo di un numero vastissimo di
-tecniche e protocolli di comunicazione esistenti nel panorama odierno. Un altro
-possibile miglioramento può essere l'implementazione di nuovi
-\texttt{NetworkManager}, che possano utilizzare tecniche diverse da quelle già
-utilizzate. In questo modo il repository ufficiale verrebbe arricchito di nuovi
-esempi, che possono essere un punto di riferimento per chi si approccia al
-linguaggio. Alcune possibili tecniche di comunicazione che possono essere
-utilizzate sono:
+\texttt{NetworkManager}, si presta all'utilizzo di svariate tecniche e
+protocolli di comunicazione. Un possibile miglioramento può essere
+l'implementazione di nuovi \texttt{NetworkManager}, che possano utilizzare
+tecniche diverse da quelle già utilizzate. In questo modo il repository
+ufficiale verrebbe arricchito di nuovi esempi, che possono essere un punto di
+riferimento per chi si approccia al linguaggio. Alcune possibili tecniche di
+comunicazione che possono essere utilizzate sono:
 \begin{itemize}
 \item \textbf{STOMP} (Simple Text-orientated Messaging Protocol): protocollo che
   mira ad offrire un canale di comunicazione basato su messaggi di testo, molto
   leggibile per l'uomo, meno efficiente in termini di banda.
-\item \textbf{COaP} (Constrained Application Protocol): protocollo sviluppato
+\item \textbf{COaP} (Constrained Application Protocol)\cite{rfc7252}: protocollo sviluppato
   per l'interazione tra macchine. Si basa su un model REST, esattamente come
   HTTP, per offrire i propri servizi. È molto competitivo in ambito
   Internet-of-Things a causa della sua capacità di essere eseguito anche in
   dispositivi con pochissime risorse.
-\item \textbf{HTTP} (HyperText Transfer Protocol): protocollo destinato allo
+\item \textbf{HTTP} (HyperText Transfer Protocol)\cite{rfc7540}: protocollo destinato allo
   scambio di informazioni, come ipertesto, risorse in file di testo o streaming
-  video. Proprio a causa della sua flessibilità potrebbe essere un possibile
-  candidato per una versione, probabilmente non competitiva, ma funzionante e
-  semplice da implementare di questo progetto.
+  video.
 \end{itemize}
 
 \subsection{Protelis su dispositivi mobili}
@@ -115,14 +104,8 @@ sfruttata per l'implementazione di una versione di Protelis in grado di essere
 eseguita all'interno di un dispositivo Android. Infatti le applicazioni per
 questi dispositivi sono scritte nativamente in Java e Kotlin, due linguaggi con
 cui le API di Protelis si possono interfacciare molto semplicemente. Inoltre la
-grandissima quantità di sensori presenti in un dispositivo mobile, come uno
-smartphone, allarga notevolmente il panorama delle possibili applicazioni che la
-programmazione aggregata potrebbe consentire. Ulteriore vantaggio dell'utilizzo
-in dispositivi mobili è la facilità di implementare la comunicazione. Basti
-pensare che ogni smartphone moderno possiede un'antenna Bluetooth e una per la
-ricezione Wi-Fi. Esempi di possibili applicazioni sono quelli menzionati alla
-Sezione \ref{sec:aggregate-computing}.
-
+i sensori presenti in un dispositivo mobile, come uno
+smartphone, allargano notevolmente il panorama delle possibili applicazioni.
 % \subsection{Ubiquitous computing}
 % Ubiquitous computing o ubicomp è un concetto dell'ingegneria del software che si
 % contrappone al tipico uso desktop del computer: mentre con questo l'utente deve

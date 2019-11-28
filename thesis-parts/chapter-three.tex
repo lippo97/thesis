@@ -1,29 +1,36 @@
 \chapter{Esempi applicativi}
 In questo capitolo viene provata la flessibilità del modello definito nella
-sezione \ref{sec:model-def}, offrendo tre diversi esempi di realizzazione di
-questo. In queste dimostrazioni sono presenti numerose semplificazioni, che
-servono per semplificare lo sviluppo e concentrarsi sui dettagli implementativi
-relativi a Protelis. Una di queste è che la simulazione inizia quando la rete ha
-già effettuato il meccanismo di discovery. Questo consente di fornire a ciascun
-dispositivo l'elenco dei propri vicini e concentrare l'attenzione sul
+sezione \ref{sec:model-def}, offrendo tre diversi esempi di realizzazione. In
+queste dimostrazioni sono presenti numerose assunzioni finalizzate a
+semplificare lo sviluppo. Una di queste è che la simulazione inizia quando la
+rete ha già effettuato il meccanismo di discovery. Questo consente di fornire a
+ciascun dispositivo l'elenco dei propri vicini e concentrare l'attenzione sul
 \texttt{NetworkManager}, vero protagonista di questa fase.
 
-Le applicazioni sono state sviluppate parallelamente in Java e in Kotlin,
+Le demo sono state sviluppate sia in Java che in Kotlin,
 utilizzando per entrambi un framework di testing, relativamente \textit{Junit} e
 \textit{Kotlintest}. In seguito i test sono stati agganciati ad una pipeline di
-continuous integration, offerta dal servizio gratuito
-TravisCI\footnote{https://travis-ci.org/}.
+continuous integration basata su TravisCI\footnote{https://travis-ci.org/}.
 
-Nelle sei simulazioni totali è stato riprodotto il medesimo scenario. In questo
-modo si può notare come l'implementazione del backend sia completamente
-trasparente al comportamento finale del sistema. Le seguenti simulazioni sono
-eseguite su una rete di cinque dispositivi emulati, disposti secondo topologia
-ad anello: ciascun dispositivo è quindi in grado
-di comunicare solo con quello a sé adiacente.
+Sono stati realizzati un totale di tre esempi applicativi, usando
+rispettivamente:
+\begin{itemize}
+\item un micro-simulatore;
+\item un esempio con comunicazione via socket TCP;
+\item un esempio con comunicazione via protocollo MQTT.
+\end{itemize}
+
+Tutti e tre gli esempi eseguono il medesimo programma aggregato, cambiando solo
+la piattaforma di esecuzione. Per ciascun esempio, si fornisce una
+implementazione in Java e una in Kotlin. In questo modo si può notare come
+l'implementazione del backend sia completamente trasparente al comportamento
+finale del sistema. Le simulazioni sono state eseguite su una rete di cinque
+dispositivi, disposti secondo topologia ad anello: ciascun dispositivo è quindi
+in grado di comunicare solo con quello a sé adiacente.
 
 \begin{minipage}{\linewidth}
 \lstinputlisting[caption={Hello, World! in Protelis.},
-label=lst:listato1]{code/hello.pt}
+label=lst:hello-protelis]{code/hello.pt}
 \end{minipage}
 
 Il programma Protelis eseguito è un semplice HelloWorld (Listato
@@ -34,7 +41,7 @@ da questo.
 % Test svolti sempre uguale
 %
 % Numero di iterazioni
-\section{Simulatore personalizzato}
+\section{Micro-simulatore}
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{diagrams/output/emulated-network-classes}
@@ -53,7 +60,7 @@ da questo.
 \end{figure}
 La prima implementazione che è stata realizzata è un simulatore.
 L'implementazione di Protelis già esistente in Alchemist, quella che utilizza
-la libreria NASA World Wind e quella già esistente nel vecchio repository di
+la libreria NASA World Wind, e quella già esistente nel vecchio repository di
 Protelis sono state la linea guida per lo sviluppo di questa versione, in
 quanto le strategie di comunicazione sono pressoché le stesse.
 
@@ -78,7 +85,7 @@ L'implementazione del \texttt{CodePath} scelta per questa versione è
 non è rilevante, poiché questo viene semplicemente referenziato in memoria,
 senza necessità di effettuarne copie.
 
-\section{Comunicazione su rete IP}
+\section{Comunicazione via socket TCP}
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{diagrams/output/socket-network-classes}
@@ -97,22 +104,21 @@ Questa versione realizza una versione distribuita del backend di Protelis.  È
 stata fatta però una semplificazione rispetto a quanto descritto dal diagramma
 presente nella Figura \ref{fig:distributed-deployment}): i \texttt{Device} non
 sono eseguiti in macchine virtuali Java distinte. Per simulare il fatto che lo
-siano essi non possono accedere a zone di memoria condivise, in particolare non
-possono richiamare i rispettivi metodi. Per comunicare è necessario che essi
-utilizzino metodi alternativi, per esempio che utilizzino la rete IP come
-tramite.
+siano essi non possono accedere a zone di memoria condivise. Per comunicare è
+necessario che essi utilizzino metodi alternativi, per esempio che utilizzino la
+rete IP come tramite.
 
 In questo esempio il passaggio dell'oggetto \texttt{Map<CodePath, Object>}
-avviene tramite l'utilizzo di socket TCP. Il protocollo
-TCP\footnote{https://tools.ietf.org/html/rfc0793} è un protocollo di rete di
-livello trasporto, orientato alla connessione, che utilizza un'architettura
-client-server e che garantisce un canale affidabile di comunicazione tra due
-applicazioni su host distinti. La comunicazione avviene nel seguente modo: un
-server si mette in ascolto su una determinata porta; un client invia al server
-una richiesta di connessione su quella porta. A questo punto il server accetta
-la connessione e viene stabilito un canale di comunicazione affidabile, che può
-essere utilizzato per lo scambio in entrambe le direzioni di flussi di dati. La
-connessione può essere terminata in qualsiasi momento da uno degli host.
+avviene tramite l'utilizzo di socket TCP. Il protocollo TCP\cite{Postel1981} è
+un protocollo di rete di livello trasporto, connesso, che utilizza
+un'architettura client-server e che garantisce un canale affidabile di
+comunicazione tra due applicazioni su host distinti. La comunicazione avviene
+nel seguente modo: un server si mette in ascolto su una determinata porta; un
+client invia al server una richiesta di connessione su quella porta. A questo
+punto il server accetta la connessione e viene stabilito un canale di
+comunicazione affidabile, che può essere utilizzato per lo scambio in entrambe
+le direzioni di flussi di dati. La connessione può essere terminata in qualsiasi
+momento da uno degli host.
 
 La classe che utilizza le socket è denominata \texttt{SocketNetworkManager}. In
 questa versione ciascun \texttt{SocketNetworkManager} contiene al proprio
@@ -125,19 +131,20 @@ messaggio. Una volta che la connessione è stabilita il mittente invia l'oggetto
 \texttt{Map<CodePath, Object>} al destinatario, che poi procede a memorizzarlo.
 
 Per permettere il passaggio di un oggetto tramite un protocollo di rete è
-necessario effettuare una serializzazione dell'oggetto, ovvero una conversione
-dello stato di un oggetto in una serie di byte, cosicché questo possa essere
-memorizzato o, in questo caso, trasferito tramite la rete sotto forma di stream
-di dati. Una volta giunto a destinazione questo viene de-serializzato, in modo
-da poter ricostruire un oggetto replica dell'originale. I principali metodi
-utilizzabili per la serializzazione di oggetti sono: Protocol
-Buffers\footnote{https://developers.google.com/protocol-buffers}, JSON, YAML,
+necessario effettuarne una serializzazione, ovvero una conversione del suo stato
+in una serie di byte, cosicché questa possa essere memorizzata o, in questo
+caso, trasferita tramite la rete sotto forma di stream di dati. Una volta giunta
+a destinazione questa viene de-serializzata, in modo da poter ricostruire un
+oggetto replica dell'originale. I principali metodi utilizzabili per la
+serializzazione di oggetti sono: Protocol
+Buffers\footnote{https://developers.google.com/protocol-buffers},
+JSON\cite{rfc7159}, YAML\cite{ben2009yaml},
 Kryo\footnote{https://github.com/EsotericSoftware/kryo},
 Elsa\footnote{https://github.com/jankotek/elsa}, etc.. In questa demo, per
 motivi di semplificazione, è stata utilizzato il meccanismo di serializzazione
-già presente in Java: l'interfaccia \texttt{Serializable}, che, per quanto non
-efficiente come come le altre già citate, soddisfa pienamente le necessità del
-progetto.
+già presente in Java: l'interfaccia \texttt{Serializable}, che, in quanto non
+sono presenti particolari richieste in termini di spazio o tempo, soddisfa
+pienamente le necessità del progetto.
 
 L'implementazione di \texttt{CodePath} utilizzata in questa demo è
 \texttt{HashingCodePath}, in quanto l'oggetto necessita di essere serializzato e
@@ -146,18 +153,16 @@ dimensione finale di questo sia predicibile a priori.
 
 \section{Protocolli orientati all'Internet-of-Things}
 Come già ampiamente discusso, le caratteristiche della programmazione aggregata
-forniscono una risposta eccellente alle richieste di campi in via di sviluppo
-sempre maggiori, quali Internet-of-Things e reti di sensori, per esempio. È
+la rendono adatta a scenari tipici di ambiti come IoT e reti di sensori. È
 importante che l'architettura definita possa supportare le tecnologie e i
-protocolli utilizzati in questi ambiti, come MQTT\footnote{http://mqtt.org/},
+protocolli utilizzati in questi ambiti, come MQTT\cite{shinde2016mqtt},
 Stomp\footnote{https://stomp.github.io/},
-CoAP\footnote{https://coap.technology/}, etc.. In questa sezione viene mostrata
+CoAP\cite{rfc7252}, eccetera. In questa sezione viene mostrata
 un'implementazione \texttt{NetworkManager} che sfrutta il protocollo MQTT, per
 permettere al proprio dispositivo di comunicare con gli altri nodi della rete.
 
 Il protocollo MQTT è un protocollo nato per l'utilizzo nell'ambito
-Internet-of-Things e comunicazione \textit{machine-to-machine}, che risulta molto
-efficiente nell'utilizzo della banda di connessione a disposizione. Utilizza il
+Internet-of-Things e comunicazione \textit{machine-to-machine}. Utilizza il
 modello \textit{publish/subscribe}. Questo prevede la presenza di un broker di
 messaggistica, un nodo centrale attraverso il quale i client possono registrarsi
 per essere notificati di determinati \textit{topic} (argomenti). In qualsiasi
@@ -192,8 +197,9 @@ messaggio ai rispettivi destinatari.
 Anche in questa versione sono state fatte molte delle scelte effettuate per
 quella precedente: i \texttt{Device} sono eseguiti all'interno della stessa Java
 Virtual Machine, ma si comportano come se non lo fossero; il serializzatore
-scelto è stato quello già predefinito in Java; l'implementazione di
-\texttt{CodePath} utilizzata è la stessa, per la stessa ragione.
+scelto è quello incluso nelle librerie di Java; l'implementazione di
+\texttt{CodePath} utilizzata è \texttt{HashingCodePath} a causa della necessità
+di trasferire questo oggetto tramite la rete.
 
 \begin{figure}
   \centering

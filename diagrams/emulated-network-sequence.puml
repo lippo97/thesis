@@ -7,7 +7,7 @@ actor ProtelisVM
 ProtelisVM -> DeviceCapabilities : commit()
 activate DeviceCapabilities
 
-DeviceCapabilities -> "sender : \nEmulatedNetworkManager" : shareState()
+DeviceCapabilities -> "sender : \nEmulatedNetworkManager" : shareState(//message//)
 activate "sender : \nEmulatedNetworkManager"
 
 "sender : \nEmulatedNetworkManager" -> "receiver : \nEmulatedNetworkManager" : receiveMessage(//message//)

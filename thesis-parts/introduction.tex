@@ -1,0 +1,45 @@
+L'ambiente da cui siamo circondati tutti i giorni è pervaso da dispositivi in
+grado di effettuare computazioni e comunicare. L'eterogeneità di questi
+dispositivi rende difficile sviluppare applicazioni distribuite resilienti e
+affidabili utilizzando le tecniche dell'ingegneria del software classica. La
+programmazione aggregata si propone come paradigma di sviluppo che fornisce
+meccanismi di comunicazione flessibili e robusti tra questi dispositivi, in
+particolare vengono presi in considerazione il \textit{field calculus} e una sua
+implementazione pratica: Protelis, un linguaggio di programmazione che supporta
+tale paradigma di programmazione.
+
+In questo lavoro vengono analizzate le caratteristiche di Protelis, in
+particolare la sua architettura e i suoi livelli di astrazione. In seguito
+vengono modellati nuovi concetti, per la realizzazione di un modello ad oggetti
+riusabile, che possa essere un potenziale punto di partenza per
+l'implementazione di un'infrastruttura facilmente estendibile, riusabile, e
+manutenibile. A supporto della flessibilità del modello, sono presentate tre
+realizzazioni dell'architettura descritta, che eseguono lo stesso programma
+aggregato, ma finalizzate a descrivere tre scenari d'uso distinti: la prima
+rappresenta un micro-simulatore, che emula un contesto distribuito, ma sfrutta
+la memoria condivisa per permettere la comunicazione tra i nodi; la seconda
+realizza un'applicazione distribuita utilizzando le socket TCP per comunicare;
+la terza si serve di un broker di messaggistica centrale e sfrutta il protocollo
+MQTT, un modello publish/subscribe, per la trasmissione dei messaggi. Per
+provare l'interoperabilità dell'architettura con i linguaggi eseguiti sulla Java
+Virtual Machine, questi tre scenari sono stati implementati sia in Java che in
+Kotlin.
+
+
+
+
+% La presente tesi è articolata in tre capitoli.
+% Nel primo di questi vengono analizzate le caratteristiche dell'architettura
+% dell'infrastruttura di Protelis, i vari livelli di astrazione dei quali sono
+% costituite le sue API, la sua interoperabilità con altri linguaggi eseguiti
+% sulla Java Virtual Machine, e il suo utilizzo nell'ambito scientifico. Nel
+% secondo vengono esaminate le API della sua infrastruttura e le sue
+% implementazioni esistenti. In questo capitolo vengono introdotti nuovi concetti
+% al modello esistente. L'obiettivo di questi è di fornire un modello ad oggetti
+% riusabile, che possa essere un potenziale punto di partenza per
+% l'implementazione di un'infrastruttura facilmente estendibile, riusabile, e
+% manutenibile. Nel terzo sono presentate tre implementazioni del modello
+% sviluppato in uno scenario applicativo reale, per dimostrarne la potenziale
+% portabilità.  Al fine di provare l'interoperabilità dell'architettura proposta
+% con i linguaggi eseguiti sulla Java Virtual Machine, l'implementazione di
+% ciascuno scenario è stato effettuata sia in Java che in Kotlin.

@@ -12,8 +12,7 @@ group Esecuzione del programma
     activate ExecutionContext
     ProtelisVM -> ProtelisProgram : compute()
     activate ProtelisProgram
-    ProtelisProgram -> ExecutionContext : <<apply changes>>
-    ProtelisProgram <-- ExecutionContext
+    ProtelisProgram <--> ExecutionContext : <<apply changes>>
     ProtelisVM <-- ProtelisProgram
     deactivate ProtelisProgram
 end
